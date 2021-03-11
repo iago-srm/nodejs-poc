@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "generate-initial-migration": "npx typeorm migration:generate -n Initial",
     "gen-env": "gen-env-types .env -o src/env.d.ts -e .",
     "build": "tsc",
     "watch": "tsc -w",
@@ -27,6 +28,8 @@
     "dotenv-safe": "^8.2.0",
     "express": "^4.17.1",
     "ioredis": "^4.19.4",
-    "reflect-metadata": "^0.1.13"
+    "pg": "^8.5.1",
+    "reflect-metadata": "^0.1.13",
+    "typeorm": "^0.2.31"
   }
 }
