@@ -7,7 +7,7 @@
 # docker
 
 - rodar na raiz do projeto:
-- `docker build -t iagosrm/<imageName>`
+- `docker build -t iagosrm/<imageName> .`
 - `docker container run -p <someAvailablePort>:<portInEnv> --rm -d iagosrm/<imageName>`
 
 # dockerized postgres
