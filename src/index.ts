@@ -2,7 +2,13 @@ import "reflect-metadata";
 import express from 'express';
 import { json } from 'body-parser';
 import "dotenv-safe/config";
-import { Database } from './frameworks';
+import { 
+  Database, 
+  emailValidator, 
+  passwordValidator, 
+  usernameValidator,
+  getErrors 
+} from './frameworks';
 import { getUserRouter } from './presentation/controllers';
 import { __prod__ } from "./constants";
 import { notFoundHandler, generalErrorHandler } from './presentation/middleware/error-handling';
@@ -16,7 +22,12 @@ const main = async () => {
   await db.init();
 
   // route bindings
-  app.use('/users', getUserRouter(db));
+  app.use('/users', 
+    getUserRouter(
+      db, 
+      { emailValidator, passwordValidator, usernameValidator },
+      getErrors
+    ));
   app.get('*', notFoundHandler);
   
   app.use(generalErrorHandler);

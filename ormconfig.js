@@ -1,7 +1,7 @@
 
 module.exports={
   "type": "postgres",
-  "logging": true,
+  "logging": false,
   "host": "localhost",
   "port": 5432,
   "synchronize": process.env.NODE_ENV !== 'production',

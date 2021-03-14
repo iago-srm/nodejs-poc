@@ -13,21 +13,21 @@ export class Database implements IDatabase {
     this.connection.runMigrations()
   }
 
-  async getOne<P>(table: string, where: any): Promise<P> {
-    const repository = this.connection.getRepository(table);
-    return repository.findOne(where) as Promise<P>
+  async getOne<P>(table: string, where: any) {
+    const repository = this.connection.getRepository<P>(table);
+    return repository.findOne(where);
   }
   
   async getAll<P>(table: string): Promise<P[]> {
-    const repository = this.connection.getRepository(table);
-    return repository.find() as Promise<P[]>
+    const repository = this.connection.getRepository<P>(table);
+    return repository.find()
   }
 
-  async insert(table: string, entry: any): Promise<void> {
-    return this.connection.getRepository(table).save(entry);
+  async insertOne<P>(table: string, entry: P): Promise<P[]> {
+    return this.connection.getRepository(table).save<P>([entry]);
   }
 
-  async update(table: string, entry: any): Promise<void> {
-    return this.connection.getRepository(table).save(entry);
+  async updateOne<P>(table: string, entry: P): Promise<P[]> {
+    return this.connection.getRepository(table).save<P>([entry]);
   }
 }

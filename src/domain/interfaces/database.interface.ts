@@ -1,7 +1,7 @@
 export interface IDatabase {
   init: () => Promise<void>;
-  getOne: <P>(table: string, where: any) => Promise<P>;
+  getOne: <P>(table: string, where: any) => Promise<P | undefined>;
   getAll: <P>(table: string) => Promise<P[]>;
-  insert: (table: string, entry: any) => Promise<void>;
-  update: (table: string, entry: any) => Promise<void>;
+  insertOne: <P>(table: string, entry: P) => Promise<P[]>;
+  updateOne: <P>(table: string, entry: P) => Promise<P[]>;
 }
