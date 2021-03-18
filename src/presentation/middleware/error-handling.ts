@@ -1,24 +1,13 @@
-import { RequestHandler, ErrorRequestHandler } from 'express';
+import { ErrorRequestHandler } from 'express';
+import { CustomError } from '../errors';
 
-export const notFoundHandler: RequestHandler = (req, res, next) => {
-  const error = `${req.ip} tried to access ${req.originalUrl}`;
+export const errorHandler: ErrorRequestHandler = (error, __, res, _) => {
 
-  res.status(404);
-
-  next(error);
-}
-
-/**
- * 
- * Expects either of the following types of error:
- * 1. String
- * 2. { msg, param }[]
- */
-export const generalErrorHandler: ErrorRequestHandler = (error, __, res, _) => {
-  if (!res.statusCode) res.status(500);
-  console.log(error)
-  if(Array.isArray(error)) {
-    return res.send(error.map(e => {return { error: e.msg, param: e.param}}))
+  if (error instanceof CustomError) {
+    return res.status(error.statusCode).send({ errors: error.serializeErrors() });
   }
-  return res.json({ error: error.toString() });
+
+  return res.status(500).send({
+    errors: [{ message: error.toString() }]
+  });
 }

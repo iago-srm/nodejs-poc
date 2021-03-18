@@ -2,8 +2,7 @@ import { Router } from 'express';
 import { UserUseCase } from '../../application';
 import { userSerializer } from '../serializers';
 import { ExpressController } from './controller-interface';
-
-const errorSerializing = "There was an error serializing the payload.";
+import { DatabaseError, RequestValidationError } from '../errors';
 
 export const getUserRouter: ExpressController = (
     db, 
@@ -21,97 +20,89 @@ export const getUserRouter: ExpressController = (
   const {
     usernameValidator,
     emailValidator,
+    emailParamsValidator,
     passwordValidator
   } = validators;
 
   const router = Router();
 
-  router.get('/', async (_, res, next) => {
-    const allUsers = await getAllUsers().catch(next);
-    res.json({users: allUsers})
+  router.get('/', async (_, res, __) => {
+    try {
+      const allUsers = await getAllUsers();
+      res.json({users: allUsers});
+    } catch {
+      throw new DatabaseError();
+    }
   });
 
   router.get('/:email', 
-    emailValidator,
-    async (req,res,next) => {
+    emailParamsValidator,
+    async (req,res,_) => {
       const errors: any[] = getErrors(req);
       if (errors.length) {
-        res.status(400);
-        return next(errors);
+        throw new RequestValidationError(errors);
       }
+
+      const requestUser = userSerializer(req.params);
+
       let user = undefined;
       try {
-        user = await getUser(userSerializer(req).email);
+        user = await getUser(requestUser.email);
       } catch {
-        res.status(400);
-        return next(errorSerializing)
+        throw new DatabaseError();
       }
+
+      if (!user) throw new DatabaseError('User with that unique identifier not found', 404);
       res.json({ user });
     }
   );
 
   router.post('/new', 
     emailValidator, passwordValidator, usernameValidator,
-    async (req, res, next) => {
+    async (req, res, _) => {
       const errors: any[] = getErrors(req);
       if (errors.length) {
-        res.status(400);
-        return next(errors);
+        throw new RequestValidationError(errors);
       }
-      let user = undefined;
-      try {
-        user = userSerializer(req.body);
-      } catch {
-        res.status(400);
-        return next(errorSerializing)
-      }
+
+      const user = userSerializer(req.body);;
       
-      user ? insertUser(user)
-      .then(() => res.sendStatus(200))
-      .catch((error: any) => {
-        console.log(JSON.stringify(error))
-        // this code means that the input value violates unique constraint at postgres
-        if(error.code === "23505") {
-          req.statusCode = 400;
-          next("There is already an account linked to that e-mail")
-        } else {
-          next(error)
-        }
-      }) : next(errorSerializing);
+      await insertUser(user);
+
+      res.sendStatus(200);
     }
   );
 
-  // allows to change password and username, but not email
-  router.post('/update', 
+  // allows to change only password
+  router.put('/update', 
     emailValidator, passwordValidator, usernameValidator,
-    async (req, res, next) => {
+    async (req, res, _) => {
      const errors: any[] = getErrors(req);
       if (errors.length) {
-        res.status(400);
-        return next(errors);
+        throw new RequestValidationError(errors);
       }
 
-      let payloadUser = undefined;
-      try {
-        payloadUser = userSerializer(req.body); 
-      } catch {
-        req.statusCode = 400;
-        return next(errorSerializing);
-      }
+      let payloadUser = userSerializer(req.body);
 
       let user = undefined;
       try {
-        user = await getUser(userSerializer(req).email);
+        user = await getUser(payloadUser.email);
+        // throw new Error();
       } catch {
-        req.statusCode = 400;
-        return next(errorSerializing);
+        throw new DatabaseError('There was a problem to get the user.');
       }
       
       if(user) {
         user.password = payloadUser.password;
-        user.username = payloadUser.username;
-        await updateUser(user).catch(next);
-        res.sendStatus(200);
+        try {
+          await updateUser(user);
+          res.sendStatus(200);
+        }
+        catch {
+          throw new DatabaseError('There was a problem to update the user.');
+        }
+      } else {
+        throw new DatabaseError('User with that unique identifier not found', 404);
       }
     }
   );

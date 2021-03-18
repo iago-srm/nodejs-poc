@@ -6,7 +6,8 @@
 
 # docker
 
-- rodar na raiz do projeto:
+Rodar na raiz do projeto:
+
 - `docker build -t iagosrm/<imageName> .`
 - `docker container run -p <someAvailablePort>:<portInEnv> --rm -d iagosrm/<imageName>`
 
@@ -14,7 +15,10 @@
 
 - baixar a imagem com `docker pull postgres`
 - rodar o container com `docker run --name dev-postgres -e POSTGRES_PASSWORD=mysecretpassword -d -p 5432:5432 -v ${HOME}/postgres-data/:/var/lib/postgresql/data postgres`.
-- settar a senha passada acima em DATABASE_URL no .env, assim como a porta (-p <localPort>:<containerPort>).
+- alterar DATABASE_URL no .env:
+  - a porta (-p `localPort` : `containerPort`),
+  - o nome do service ao invés de localhost (`serviceName`-postgres-srv.yaml -> kind:Service -> metadata/name),
+  - A senha passada para POSTGRES_PASSWORD acima.
 
 ## Accessing the db
 
