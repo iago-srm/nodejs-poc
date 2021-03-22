@@ -4,7 +4,7 @@ import 'express-async-errors';
 import { json } from 'body-parser';
 import "dotenv-safe/config";
 import { 
-  Database, 
+  RedisProxy,
   emailValidator, 
   emailParamsValidator,
   passwordValidator, 
@@ -22,16 +22,17 @@ const main = async () => {
   const app = express();
   app.use(json());
 
-  const db = new Database();
+  const db = new RedisProxy();
   await db.init();
-
-    // route bindings
+  
+  // route bindings
   app.use('/users', 
     getUserRouter(
       db, 
       { emailValidator, emailParamsValidator, passwordValidator, usernameValidator },
       getErrors
     ));
+
   app.all('*', () => {throw new NotFoundError()});
   
   app.use(errorHandler);
@@ -41,4 +42,8 @@ const main = async () => {
   });
 };
 
-main();
+try {
+  main();
+} catch(e) {
+  console.error(e);
+}

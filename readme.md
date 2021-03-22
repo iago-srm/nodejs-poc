@@ -34,3 +34,11 @@ Rodar na raiz do projeto:
 - Start the container with `docker run -p 80:80 -e 'PGADMIN_DEFAULT_EMAIL=user@domain.local' -e 'PGADMIN_DEFAULT_PASSWORD=SuperSecret' --name dev-pgadmin -d dpage/pgadmin4`
 - Run `docker inspect dev-postgres -f "{{json .NetworkSettings.Networks }}"` to print information about the db container. Copy the value of IPAddress field and go to localhost:80.
 - In the browser, "Add New Server" and put the IPAddress under "Host name/address", as well as "postgres" and "mysecretpassword" as username and password (credentials used to set up db above). That should give you access to the db through the browser.
+
+# dockerized redis
+- Download the docker image with `docker pull redis`
+- Access the container doing `docker exec -it dev-redis /bin/bash`
+- In the container terminal, run `redis-cli` to input commands. 
+  - `KEYS *` to get all keys.
+  - `FLUSHALL` to delete all keys.
+

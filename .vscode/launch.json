@@ -9,7 +9,7 @@
       "request": "attach",
       "protocol": "inspector",
       "restart": true,
-      "name": "Launch Program",
+      "name": "Attach debugger",
       // "program": "${workspaceFolder}/src/index.ts",
       "skipFiles": [
         "<node_internals>/**"

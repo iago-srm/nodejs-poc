@@ -40,7 +40,7 @@ export class Database implements IDatabase {
     }
   }
 
-  async updateOne<P>(table: string, entry: P): Promise<P> {
-    return this.connection.getRepository(table).save<P>(entry);
+  async updateOne<P>(table: string, criterium: {[field: string]: string}, entity: Partial<P>) {
+    return this.connection.getRepository(table).update(criterium, entity);
   }
 }

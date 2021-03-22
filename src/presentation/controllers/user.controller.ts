@@ -28,6 +28,8 @@ export const getUserRouter: ExpressController = (
 
   router.get('/', async (_, res, __) => {
     try {
+      // TODO: pagination
+      // console.log(req.query.limit, req.query.offset); /users?limit=10&offset=5
       const allUsers = await getAllUsers();
       res.json({users: allUsers});
     } catch {
@@ -75,7 +77,7 @@ export const getUserRouter: ExpressController = (
 
   // allows to change only password
   router.put('/update', 
-    emailValidator, passwordValidator, usernameValidator,
+    emailValidator, passwordValidator,
     async (req, res, _) => {
      const errors: any[] = getErrors(req);
       if (errors.length) {
@@ -95,7 +97,10 @@ export const getUserRouter: ExpressController = (
       if(user) {
         user.password = payloadUser.password;
         try {
-          await updateUser(user);
+          await updateUser({
+            email: payloadUser.email, 
+            password: payloadUser.password
+          });
           res.sendStatus(200);
         }
         catch {
