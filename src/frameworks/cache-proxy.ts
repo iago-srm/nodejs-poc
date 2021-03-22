@@ -18,7 +18,10 @@ export class RedisProxy extends Database {
 
   init() {
     // this._redisClient = new AsyncRedis({ path: process.env.REDIS_URL});
-    this._redisClient = new AsyncRedis({ host: '127.0.0.1', port: 6379});
+    this._redisClient = new AsyncRedis({ 
+      host: process.env.REDIS_HOST, 
+      port: parseInt(process.env.REDIS_PORT)
+    });
 
     return super.init();
   };
