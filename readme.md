@@ -41,4 +41,5 @@ Rodar na raiz do projeto:
 - In the container terminal, run `redis-cli` to input commands. 
   - `KEYS *` to get all keys.
   - `FLUSHALL` to delete all keys.
+- In order to get all values stored in redis, do `docker exec -i dev-redis bash < get-redis-entries.sh`. 
 
