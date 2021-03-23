@@ -1,6 +1,6 @@
 import { DatabaseError } from '../presentation/errors';
 import { AsyncRedis } from './async-redis';
-import { Database } from '../frameworks/database';
+import { Database } from './database';
 
 // with this implementation, it is necessary that the object literal used to retrieve the
 // entity be identical to the one used as criterium to find an entity for update.
