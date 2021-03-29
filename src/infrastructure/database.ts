@@ -1,22 +1,12 @@
 import { DatabaseError } from "../presentation/errors";
 import { createConnection, Connection } from "typeorm";
-import { __prod__ } from '../constants';
-import { IDatabase } from '../domain/interfaces/database.interface';
 
-export const getDatabaseError = (e: any) => {
-  if(e.code === '23505') {
-    return
-  }
-};
-export class Database implements IDatabase {
+export class Database {
   
   connection: Connection;
 
   async init () {
     this.connection = await createConnection();
-
-    // goes to the migrations folder and builds the db
-    this.connection.runMigrations()
   }
 
   async getOne<P>(table: string, where: any) {

@@ -1,8 +1,15 @@
+# setup prévio
+
+- `npm i -g typeorm`.
+- Have a "test" db running locally for automated testing and a "staging" db (see ormconfig.js) running in the same pg app or in the cloud.
+
 # desenvolvimento
 
 - 1º terminal: `npm run watch`
 - 2º terminal: `npm run dev`
-- A cada nova environment variable criada, rodar `npm run gen-env`, para atualizar o .env.d.ts
+- A cada nova environment variable criada, rodar `npm run gen-env`, para atualizar o .env.d.ts.
+Criar a variável com valor em .env e a key em .env.example (que vai para o git).
+- A cada mudança ao db schema, fazer `typeorm migration:generate -n MigrationName`. One "Initial" migration after initial schema.
 
 # docker
 
@@ -31,7 +38,7 @@ Rodar na raiz do projeto:
 ### pgAdmin
 
 - Download the docker image with `docker pull dpage/pgadmin4`
-- Start the container with `docker run -p 80:80 -e 'PGADMIN_DEFAULT_EMAIL=user@domain.local' -e 'PGADMIN_DEFAULT_PASSWORD=SuperSecret' --name dev-pgadmin -d dpage/pgadmin4`
+- Start the container with `docker run -p 80:80 -e 'PGADMIN_DEFAULT_EMAIL=user@domain.local' -e 'PGADMIN_DEFAULT_PASSWORD=SuperSecret' --name dev-pgadmin -d dpage/pgadmin4`. Credenciais passadas como env serão para login no pgAdmin4.
 - Run `docker inspect dev-postgres -f "{{json .NetworkSettings.Networks }}"` to print information about the db container. Copy the value of IPAddress field and go to localhost:80.
 - In the browser, "Add New Server" and put the IPAddress under "Host name/address", as well as "postgres" and "mysecretpassword" as username and password (credentials used to set up db above). That should give you access to the db through the browser.
 

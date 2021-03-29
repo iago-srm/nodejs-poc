@@ -1,27 +1,26 @@
 import { Router } from 'express';
-import { UserUseCase } from '../../application';
+// import { UserUseCase } from '../../application';
 import { userSerializer } from '../serializers';
 import { ExpressController } from './controller-interface';
-import { DatabaseError, RequestValidationError } from '../errors';
+import { DatabaseError } from '../errors';
+import { validateRequest } from '../middleware';
+import {
+  getUser,
+  getAllUsers,
+  insertUser,
+  updateUser
+} from '../../application/user.use-case';
 
 export const getUserRouter: ExpressController = (
-    db, 
     validators,
-    getErrors
   ) => {
 
-  const {
-    getUser,
-    getAllUsers,
-    insertUser,
-    updateUser
-  } = UserUseCase(db);
-  
   const {
     usernameValidator,
     emailValidator,
     emailParamsValidator,
-    passwordValidator
+    newPasswordValidator,
+    existingPasswordValidator,
   } = validators;
 
   const router = Router();
@@ -39,11 +38,8 @@ export const getUserRouter: ExpressController = (
 
   router.get('/:email', 
     emailParamsValidator,
+    validateRequest,
     async (req,res,_) => {
-      const errors: any[] = getErrors(req);
-      if (errors.length) {
-        throw new RequestValidationError(errors);
-      }
 
       const requestUser = userSerializer(req.params);
 
@@ -60,12 +56,9 @@ export const getUserRouter: ExpressController = (
   );
 
   router.post('/new', 
-    emailValidator, passwordValidator, usernameValidator,
+    emailValidator, newPasswordValidator, usernameValidator,
+    validateRequest,
     async (req, res, _) => {
-      const errors: any[] = getErrors(req);
-      if (errors.length) {
-        throw new RequestValidationError(errors);
-      }
 
       const user = userSerializer(req.body);;
       
@@ -77,12 +70,9 @@ export const getUserRouter: ExpressController = (
 
   // allows to change only password
   router.put('/update', 
-    emailValidator, passwordValidator,
+    emailValidator, existingPasswordValidator,
+    validateRequest,
     async (req, res, _) => {
-     const errors: any[] = getErrors(req);
-      if (errors.length) {
-        throw new RequestValidationError(errors);
-      }
 
       let payloadUser = userSerializer(req.body);
 

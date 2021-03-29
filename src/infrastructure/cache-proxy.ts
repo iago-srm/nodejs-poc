@@ -6,18 +6,18 @@ import { Database } from './database';
 // entity be identical to the one used as criterium to find an entity for update.
 export class RedisProxy extends Database {
 
-  private _redisClient: AsyncRedis;
-  // in seconds
-  constructor(private _cacheDuration = 100){
-    super();
-  }
-
+  private _cacheDuration = 100
+  _redisClient: AsyncRedis;
+  
   private _getEntryName(table: string, where: any) {
     return `${table}_${JSON.stringify(where)}`;
   }
 
+  constructor() {
+    super();
+  }
+
   init() {
-    // this._redisClient = new AsyncRedis({ path: process.env.REDIS_URL});
     this._redisClient = new AsyncRedis({ 
       host: process.env.REDIS_HOST, 
       port: parseInt(process.env.REDIS_PORT)
@@ -26,7 +26,7 @@ export class RedisProxy extends Database {
     return super.init();
   };
 
-  async getOne<P>(table: string, where: any) {
+  async getOne<P>(table: string, where: any): Promise<P | undefined> {
     let cacheResult: string | null = 
       await this._redisClient.asyncGet(this._getEntryName(table, where));
     if(cacheResult) return JSON.parse(cacheResult);
@@ -50,3 +50,6 @@ export class RedisProxy extends Database {
     return result;
   }
 }
+
+const redis = new RedisProxy();
+export { redis }

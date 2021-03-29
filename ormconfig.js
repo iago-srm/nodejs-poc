@@ -1,13 +1,32 @@
-
-module.exports={
+const commonConfig = {
   "type": "postgres",
   "logging": false,
-  "host": "localhost",
-  "port": 5432,
-  "synchronize": process.env.NODE_ENV !== 'production',
   "username": "postgres",
   "password": "mysecretpassword",
-  "database": "postgres",
-  "entities": ["dist/entities/*.js"],
-  "migrations": ["dist/migrations/*.js"]
+  // synchronize makes the db reflect the model's code
+  "synchronize": process.env.NODE_ENV !== 'production',
+  "entities": ["dist/domain/entities/*.js"],
+  "migrations": ["dist/migrations/*.js"],
+  "cli": {
+    "migrationsDir": [
+      "src/migrations"
+    ],
+    "entitiesDir": [
+      "src/domain/entities"
+    ]
+  }
 }
+module.exports=[{
+  ...commonConfig,
+  "host": "localhost",
+  "port": 5432,
+  "database": "staging"
+  },
+  {
+  ...commonConfig,
+  "name": "test",
+  "host": "localhost",
+  "port": 5432,
+  "database": "tests",
+  }
+]

@@ -6,12 +6,17 @@ import {
   Column,
 } from "typeorm";
 
+export enum UserRole {
+    ADMIN = "admin",
+    COMMON = "common",
+}
+
 @Entity()
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ unique: true, nullable: true })
+  @Column({ nullable: true })
   username: string;
 
   @Column({ unique: true })
@@ -19,6 +24,13 @@ export class User {
 
   @Column()
   password: string;
+
+  @Column({
+      type: "enum",
+      enum: UserRole,
+      default: UserRole.COMMON
+  })
+  role: UserRole
 
   @CreateDateColumn()
   createdAt: Date;
