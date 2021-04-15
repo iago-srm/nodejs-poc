@@ -1,30 +1,21 @@
 import { json } from 'body-parser';
 import express from 'express';
 import 'express-async-errors';
-import { 
-  emailValidator, 
-  emailParamsValidator,
-  newPasswordValidator, 
-  existingPasswordValidator,
-  usernameValidator
-} from './infrastructure';
-import { getUserRouter } from './presentation/controllers';
+import { errorHandler, startPolyglot, NotFoundError } from '@iagosrm/common';
+import { userRouter } from './presentation/controllers';
 import { __prod__ } from "./constants";
-import { errorHandler } from './presentation/middleware';
-import { NotFoundError } from "./presentation/errors";
+import { Messages } from './locales';
 
- // necessary initializations
+const baseUrn = process.env.BASE_URN;
+
 const app = express();
-app.use(json());
 
-// route bindings
-app.use('/api/v1/users', 
-  getUserRouter(
-    { emailValidator, emailParamsValidator, newPasswordValidator, existingPasswordValidator, usernameValidator },
-  ));
+app.use(json());
+app.use(startPolyglot(Messages));
+
+app.use(`${baseUrn}/users`, userRouter);
 
 app.all('*', () => {throw new NotFoundError()});
-
 app.use(errorHandler);
 
 export { app };

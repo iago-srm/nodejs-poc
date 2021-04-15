@@ -11,7 +11,7 @@ export enum UserRole {
     COMMON = "common",
 }
 
-@Entity()
+@Entity('users')
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
@@ -32,9 +32,9 @@ export class User {
   })
   role: UserRole
 
-  @CreateDateColumn()
-  createdAt: Date;
+  @CreateDateColumn({type: "timestamp"})
+  createdAt?: Date;
 
-  @UpdateDateColumn()
-  updatedAt: Date;
+  @UpdateDateColumn({type: "timestamp"})
+  updatedAt?: Date;
 }

@@ -1,8 +1,11 @@
 import { User } from '../domain';
-import { db } from '../infrastructure/get-db';
+import { dbWithCache } from '../infrastructure';
 
-export const getUser = async (email: string) => await db.getOne<User>('user', { email });
-export const getAllUsers = async () => await db.getAll<User>('user');
-export const insertUser = async (user: User) => db.insertOne<User>('user', user);
-export const updateUser = async ({email, password} : {email: string, password: string}) => 
-    db.updateOne<User>('user', { email }, { password });
+const tableName = 'users';
+
+export const getUser = (email: string) => dbWithCache.getOne<User>(tableName, { email });
+export const getAllUsers = () => dbWithCache.getAll<User>(tableName);
+export const insertUser = (user: User | User[]) => dbWithCache.insert<User>(tableName, user);
+export const updateUser = ({ email, password } : { email: string, password: string }) => 
+    dbWithCache.updateOne<User>(tableName, { email }, { password });
+export const deleteUser = ({ email }: { email: string }) => dbWithCache.delete<User>(tableName, { email });

@@ -20,13 +20,14 @@ module.exports=[{
   ...commonConfig,
   "host": "localhost",
   "port": 5432,
-  "database": "staging"
+  "database": "staging",
+  "name": 'development'
   },
   {
   ...commonConfig,
   "name": "test",
   "host": "localhost",
   "port": 5432,
-  "database": "tests",
+  "database": "test",
   }
 ]
