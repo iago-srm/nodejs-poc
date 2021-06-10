@@ -1,3 +1,36 @@
+# What this is
+
+This is a NodeJS backend server _proof-of-concept_. I have implemented many of the most useful features you'd want in a backend server (see [this part](#why-it-is-cool)).  
+To make this the code of a real project, all you have to do is add your own business entities (I have implemented a "user" entity) and choose the features you need, by removing features from the code and/or adding new ones (hopefully, as the project progresses, having to add new features to implement real projects will happen less often).
+
+# Why it is cool
+
+Here is a rundown of the concepts and technologies this project makes use of, by category.
+### Javascript 
+- [Typescript](https://www.typescriptlang.org/) (along with [ts-node-dev](https://www.npmjs.com/package/ts-node-dev) for development)
+- [Express](https://expressjs.com/)
+- [TypeORM](https://typeorm.io/#/)
+### Web 
+- [Postgres](https://www.postgresql.org/) database
+- Cache layer with [Redis](https://redis.io/)
+- Internationalized validation messages
+- Validation of body and query parameters on all routes with [express-validator](https://express-validator.github.io/docs/)
+### Software Engineering
+- Dependency Injection containerization with [awilix](https://github.com/jeffijoe/awilix)
+- [Clean Architecture](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html)
+- Integration tests of all routes with [Jest](https://jestjs.io/)
+### other
+- [Docker](https://www.docker.com/). App is dockerized and a bunch of other services it needs to run locally are as well. Its has a docker-compose.yaml file to help.
+
+# Run it locally
+
+# TODO
+This is a work in progress. Here are my priorities moving forward
+- Write test for redis after PUT calls.
+- Internationalize _Error()_ messages.
+- CI/CD with Github Actions and run tests there.
+- Implement a branch with GraphQL instead of REST (Express).
+
 # setup prévio
 
 - `npm i -g typeorm`.
