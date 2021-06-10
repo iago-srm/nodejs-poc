@@ -1,20 +1,24 @@
-import { dbWithCache, AsyncRedis } from '../infrastructure';
+import { testContainer, Dependencies } from "../containers";
+import { Application } from "../app";
+import { RedisProxy } from "@infrastructure";
 
 export const baseUrn = `/api/v1/users`;
-export const testRedis = new AsyncRedis({
-  host: process.env.REDIS_HOST,
-  port: parseInt(process.env.REDIS_PORT)
-});
+
+export const testAppInstance: Application = testContainer.resolve(
+  Dependencies.APP
+) as Application;
+export const testDbInstance: RedisProxy = testContainer.resolve(
+  Dependencies.DB
+);
 
 beforeAll(() => {
-  const connection = process.env.NODE_ENV ? process.env.NODE_ENV : 'production';
-  return dbWithCache.initWithCache(connection, testRedis);
+  return testAppInstance.start();
 });
 
 beforeEach(() => {
-  return dbWithCache.deleteAll();
+  return testDbInstance.deleteAll();
 });
 
 afterAll(() => {
-  return dbWithCache.closeConnection();
+  return testContainer.dispose();
 });

@@ -12,16 +12,16 @@
 
 # docker
 
-Rodar na raiz do projeto:
+Run at the root of the project:
 
-- `docker build -t iagosrm/<imageName> .`
-- `docker container run -p <someAvailablePort>:<portInEnv> --rm -d iagosrm/<imageName>`
+- `docker-compose pull` in order to pull all necessary images .
+- `docker build -t iagosrm/nodejs-poc .`
+- `docker container run -p 3000:3000 --rm -d iagosrm/nodejs-poc`
 
 # dockerized postgres
 
-- baixar a imagem com `docker pull postgres`
-- alterar DATABASE_URL no .env:
-  - a porta (-p `localPort` : `containerPort`),
+- update DATABASE_URL on .env:
+  - the port (-p `localPort` : `containerPort`),
   - o nome do service ao invés de localhost (`serviceName`-postgres-srv.yaml -> kind:Service -> metadata/name),
   - A senha passada para POSTGRES_PASSWORD acima.
 
@@ -35,16 +35,13 @@ Rodar na raiz do projeto:
 
 ### pgAdmin
 
-- Download the docker image with `docker pull dpage/pgadmin4`
-- Run `docker inspect dev-postgres -f "{{json .NetworkSettings.Networks }}"` to print information about the db container. Copy the value of IPAddress field and go to localhost:80.
-- In the browser, "Add New Server" and put the IPAddress under "Host name/address", as well as "postgres" and "mysecretpassword" as username and password (credentials used to set up db above). That should give you access to the db through the browser.
+- Run `docker inspect nodejs-poc_dev-postgres_1 -f "{{json .NetworkSettings.Networks }}"` to print information about the db container. Copy the value of IPAddress field and go to localhost:80.
+- In the browser, "Add New Server" and put the IPAddress under "Host name/address", as well as "postgres" and "mysecretpassword" as username and password (credentials used on docker-compose).
+  That should give you access to the db through the browser.
 
 # dockerized redis
 
-- Download the docker image with `docker pull redis`.
-- Access the container doing `docker exec -it dev-redis /bin/bash`
 - In the container terminal, run `redis-cli` to input commands.
   - `KEYS *` to get all keys.
   - `FLUSHALL` to delete all keys.
   - `exit` in order to exit both redis-cli and container's terminal.
-- In order to get all values stored in redis, do `docker exec -i <redis-container-name> bash < getRedisEntries.sh`.

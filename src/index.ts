@@ -1,24 +1,17 @@
 import "reflect-metadata";
 import "dotenv-safe/config";
-import { dbWithCache, AsyncRedis } from './infrastructure';
-import { app } from './app';
+
+// import { dbWithCache, AsyncRedis } from "./infrastructure";
+import { devContainer, Dependencies } from "./containers";
+import { Application } from "./app";
 
 const main = async () => {
-
-  const connection = process.env.NODE_ENV ? process.env.NODE_ENV : 'production';
-  const redis = new AsyncRedis({
-    host: process.env.REDIS_HOST,
-    port: parseInt(process.env.REDIS_PORT)
-  });
-  await dbWithCache.initWithCache(connection, redis);
-  
-  app.listen(parseInt(process.env.PORT), () => {
-    console.log(`Listening on port ${process.env.PORT}`);
-  });
+  const app: Application = devContainer.resolve(Dependencies.APP);
+  await app.start();
 };
 
 try {
   main();
-} catch(e) {
+} catch (e) {
   console.error(e);
 }

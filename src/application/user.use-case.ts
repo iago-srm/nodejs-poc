@@ -1,11 +1,17 @@
-import { User } from '../domain';
-import { dbWithCache } from '../infrastructure';
+import { User } from "@domain";
+import { IDatabase } from "@infrastructure";
 
-const tableName = 'users';
+const tableName = "users";
+export const UserUseCase = (db: IDatabase) => {
+  return {
+    getUser: (email: string) => db.getOne<User>(tableName, { email }),
+    getAllUsers: () => db.getAll<User>(tableName),
+    insertUser: (user: User | User[]) => db.insert<User>(tableName, user),
+    updateUser: ({ email, password }: { email: string; password: string }) =>
+      db.updateOne<User>(tableName, { email }, { password }),
+    deleteUser: ({ email }: { email: string }) =>
+      db.delete(tableName, { email }),
+  };
+};
 
-export const getUser = (email: string) => dbWithCache.getOne<User>(tableName, { email });
-export const getAllUsers = () => dbWithCache.getAll<User>(tableName);
-export const insertUser = (user: User | User[]) => dbWithCache.insert<User>(tableName, user);
-export const updateUser = ({ email, password } : { email: string, password: string }) => 
-    dbWithCache.updateOne<User>(tableName, { email }, { password });
-export const deleteUser = ({ email }: { email: string }) => dbWithCache.delete<User>(tableName, { email });
+export type IUserUseCase = ReturnType<typeof UserUseCase>;

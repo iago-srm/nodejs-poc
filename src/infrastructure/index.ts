@@ -1,2 +1,3 @@
-export * from './cache-proxy';
-export * from './async-redis';
+export * from "./cached-database";
+export { IDatabase } from "./database";
+export * from "./redis-client";

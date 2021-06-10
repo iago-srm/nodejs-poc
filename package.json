@@ -5,11 +5,10 @@
   "main": "index.js",
   "scripts": {
     "generate-initial-migration": "npx typeorm migration:generate -n Initial",
-    "generate-messages": "node dist/locales/converter.js",
     "gen-env": "gen-env-types .env -o src/env.d.ts -e .",
     "build": "tsc",
     "watch": "tsc -w",
-    "dev": "cross-env NODE_ENV=development nodemon --inspect dist/index.js",
+    "dev": "cross-env NODE_ENV=development ts-node-dev --inspect=4321 --respawn -r tsconfig-paths/register src/index.ts",
     "start": "cross-env NODE_ENV=production node dist/index.js",
     "test": "cross-env NODE_ENV=test jest --watchAll --no-cache --runInBand"
   },
@@ -21,8 +20,19 @@
       "<rootDir>/__test__/setup.ts"
     ],
     "setupFiles": [
-      "<rootDir>/__test__/set-env-vars.ts"
-    ]
+      "dotenv/config"
+    ],
+    "moduleDirectories": [
+      "node_modules", 
+      "src"
+    ],
+    "moduleNameMapper": {
+      "@presentation": ["<rootDir>/presentation/index.ts"],
+      "@locales": ["<rootDir>/locales/index.ts"],
+      "@infrastructure": ["<rootDir>/infrastructure/index.ts"],
+      "@application": ["<rootDir>/application/index.ts"],
+      "@domain": ["<rootDir>/domain/index.ts"]
+    }
   },
   "keywords": [],
   "author": "",
@@ -44,11 +54,14 @@
     "nodemon": "^2.0.7",
     "supertest": "^6.1.3",
     "ts-jest": "^26.5.4",
+    "ts-node-dev": "^1.1.6",
+    "tsconfig-paths": "^3.9.0",
     "typed-promisify": "^0.4.0",
     "typescript": "^4.1.3"
   },
   "dependencies": {
     "@iagosrm/common": "^1.0.10",
+    "awilix": "^4.3.4",
     "body-parser": "^1.19.0",
     "dotenv-safe": "^8.2.0",
     "express": "^4.17.1",

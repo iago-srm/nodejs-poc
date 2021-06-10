@@ -10,13 +10,15 @@
       "protocol": "inspector",
       "restart": true,
       "name": "Attach debugger",
+      "port": 4321,
       // "program": "${workspaceFolder}/src/index.ts",
       "skipFiles": [
         "<node_internals>/**"
       ],
-      "outFiles": [
-        "${workspaceFolder}/dist/**/*.js"
-      ]
+      "cwd": "${workspaceRoot}"
+      // "outFiles": [
+      //   "${workspaceFolder}/dist/**/*.js"
+      // ]
     }
   ]
 }

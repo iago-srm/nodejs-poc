@@ -1,21 +1,51 @@
-import { json } from 'body-parser';
-import express from 'express';
-import 'express-async-errors';
-import { errorHandler, startPolyglot, NotFoundError } from '@iagosrm/common';
-import { userRouter } from './presentation/controllers';
+import express, { Express, RequestHandler, Router } from "express";
+import "express-async-errors";
+import { NotFoundError } from "@iagosrm/common";
 import { __prod__ } from "./constants";
-import { Messages } from './locales';
+import { RedisProxy } from "@infrastructure";
+import { Server } from "http";
 
 const baseUrn = process.env.BASE_URN;
 
-const app = express();
+interface ApplicationParams {
+  middleware: { [key: string]: RequestHandler };
+  userRouter: Router;
+  db: RedisProxy;
+}
 
-app.use(json());
-app.use(startPolyglot(Messages));
+export class Application {
+  _app: Express;
+  _db: RedisProxy;
+  _server: Server;
 
-app.use(`${baseUrn}/users`, userRouter);
+  constructor({ middleware, userRouter, db }: ApplicationParams) {
+    this._app = express();
+    this._db = db;
+    this._app.use(middleware.json);
+    this._app.use(middleware.polyglot);
 
-app.all('*', () => {throw new NotFoundError()});
-app.use(errorHandler);
+    this._app.use(`${baseUrn}/users`, userRouter);
 
-export { app };
+    this._app.all("*", () => {
+      throw new NotFoundError();
+    });
+
+    this._app.use(middleware.errorHandler);
+  }
+
+  async start() {
+    await this._db.init();
+    if (process.env.NODE_ENV !== "test") {
+      this._server = this._app.listen(
+        parseInt(process.env.PORT || "3000"),
+        () => {
+          console.log(`Listening on port ${process.env.PORT}`);
+        }
+      );
+    }
+  }
+
+  async stop() {
+    this._server.close();
+  }
+}

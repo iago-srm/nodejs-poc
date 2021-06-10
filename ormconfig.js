@@ -1,12 +1,12 @@
 const commonConfig = {
   "type": "postgres",
   "logging": false,
-  "username": "postgres",
-  "password": "mysecretpassword",
+  "username": process.env.POSTGRES_USER,
+  "password": process.env.POSTGRES_PASSWORD,
   // synchronize makes the db reflect the model's code
   "synchronize": process.env.NODE_ENV !== 'production',
-  "entities": ["dist/domain/entities/*.js"],
-  "migrations": ["dist/migrations/*.js"],
+  "entities": ["src/domain/entities/*.ts"],
+  "migrations": ["src/migrations/*.ts"],
   "cli": {
     "migrationsDir": [
       "src/migrations"
@@ -16,11 +16,12 @@ const commonConfig = {
     ]
   }
 }
+
 module.exports=[{
   ...commonConfig,
   "host": "localhost",
   "port": 5432,
-  "database": "staging",
+  "database": "development",
   "name": 'development'
   },
   {
@@ -28,6 +29,6 @@ module.exports=[{
   "name": "test",
   "host": "localhost",
   "port": 5432,
-  "database": "test",
+  "database": 'test'
   }
 ]

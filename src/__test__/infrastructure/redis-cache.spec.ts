@@ -1,18 +1,27 @@
-import request from 'supertest';
-import { app } from '../../app';
-import { 
-  insertUser,
-} from '../../application';
-import { getMockUsersArray } from '../mock-data';
-import { AsyncRedis } from '../../infrastructure/async-redis';
-import { baseUrn, testRedis } from '../setup';
+import request from "supertest";
+import { getMockUsersArray } from "../mock-data";
+import { baseUrn, testDbInstance } from "../setup";
+import { testAppInstance } from "../setup";
+import { IUserUseCase } from "@application";
+import { testContainer, Dependencies } from "../../containers";
+import { normalizeJson } from "../test.helpers";
 
-describe('Redis cache.', () => {
-  it('user is saved after get/:email route is called.', async () => {
+const app = testAppInstance._app;
+const userUseCase: IUserUseCase = testContainer.resolve(
+  Dependencies.USERUSECASE
+);
+const { insertUser } = userUseCase;
+
+describe("Redis cache.", () => {
+  it("user is saved after get/:email route is called.", async () => {
     const user = getMockUsersArray(1)[0];
     await insertUser(user);
     await request(app).get(`${baseUrn}/${user.email}`);
-    const cachedUser = await testRedis.asyncGet(AsyncRedis._getEntryName('users', { email: user.email }));
-    expect(JSON.stringify({...JSON.parse(cachedUser)})).toBe(user);
+    const cachedUser = await testDbInstance._redisClient.asyncGet(
+      testDbInstance._redisClient._getEntryName("users", {
+        email: user.email,
+      })
+    );
+    expect(JSON.parse(cachedUser)).toStrictEqual(normalizeJson(user));
   });
 });
