@@ -8,6 +8,7 @@ import {
   getRoleValidator,
 } from "@presentation";
 import { IUserUseCase } from "@application";
+import { User } from "@domain";
 
 const usernameRequired = true;
 
@@ -34,8 +35,7 @@ export const makeUserRouter = (userUseCase: IUserUseCase) => {
     validateRequest,
     async (req, res, _) => {
       const requestUser = userSerializer(req.params);
-
-      let user = undefined;
+      let user: User | undefined = undefined;
       try {
         user = await getUser(requestUser.email);
       } catch {
@@ -77,7 +77,7 @@ export const makeUserRouter = (userUseCase: IUserUseCase) => {
       let reqBodyUser = userSerializer(req.body);
       let reqParamsUser = userSerializer(req.params);
 
-      let user = undefined;
+      let user: User | undefined = undefined;
       try {
         user = await getUser(reqParamsUser.email);
         // throw new Error();
@@ -86,7 +86,7 @@ export const makeUserRouter = (userUseCase: IUserUseCase) => {
       }
 
       if (user) {
-        user.password = reqBodyUser.password;
+        (user as User).password = reqBodyUser.password;
         try {
           await updateUser({
             email: reqParamsUser.email,

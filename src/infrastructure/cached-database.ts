@@ -32,7 +32,7 @@ export class RedisProxy extends Database implements IDatabase {
       this._redisClient._getEntryName(table, where)
     );
     if (cacheResult) return JSON.parse(cacheResult);
-    let dbResult = undefined;
+    let dbResult: P | undefined = undefined;
     try {
       dbResult = await super.getOne<P>(table, where);
       if (dbResult)

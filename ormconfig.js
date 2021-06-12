@@ -19,7 +19,7 @@ const commonConfig = {
 
 module.exports=[{
   ...commonConfig,
-  "host": "localhost",
+  "host": process.env.POSTGRES_HOST_DEVELOPMENT,
   "port": 5432,
   "database": "development",
   "name": 'development'

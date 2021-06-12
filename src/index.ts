@@ -1,7 +1,5 @@
 import "reflect-metadata";
 import "dotenv-safe/config";
-
-// import { dbWithCache, AsyncRedis } from "./infrastructure";
 import { devContainer, Dependencies } from "./containers";
 import { Application } from "./app";
 
