@@ -4,7 +4,8 @@ const commonConfig = {
   "username": process.env.POSTGRES_USER,
   "password": process.env.POSTGRES_PASSWORD,
   // synchronize makes the db reflect the model's code
-  "synchronize": process.env.NODE_ENV !== 'production',
+  // "synchronize": process.env.NODE_ENV !== 'production',
+  "synchronize": true,
   "entities": ["src/domain/entities/*.ts"],
   "migrations": ["src/migrations/*.ts"],
   "cli": {
@@ -21,7 +22,7 @@ module.exports=[{
   ...commonConfig,
   "host": process.env.POSTGRES_HOST_DEVELOPMENT,
   "port": 5432,
-  "database": "development",
+  "database": "postgres",
   "name": 'development'
   },
   {

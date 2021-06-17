@@ -5,6 +5,9 @@ services:
     image: iagosrm/nodejs-poc
     ports:
       - 3000:3000
+    depends_on:
+      - "dev-postgres"
+    command: ["./wait-for-it.sh", "db:5432", "--", "npm", "start"]
   # test-redis:
   #   image: redis
   #   ports:
@@ -20,7 +23,7 @@ services:
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=mysecretpassword
-      - POSTGRES_DB=development
+      - POSTGRES_DB=test
     volumes:
       - ${HOME}/postgres-data/:/var/lib/postgresql/data
   pgadmin:
