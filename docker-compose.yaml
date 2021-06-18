@@ -1,21 +1,21 @@
 version: "3"
 
 services:
-  app:
-    image: iagosrm/nodejs-poc
-    ports:
-      - 3000:3000
-    depends_on:
-      - "dev-postgres"
-    command: ["./wait-for-it.sh", "db:5432", "--", "npm", "start"]
-  # test-redis:
-  #   image: redis
+  # app:
+  #   image: iagosrm/nodejs-poc
   #   ports:
-  #     - 6380:6379
-  dev-redis:
+  #     - 3000:3000
+  #   depends_on:
+  #     - "dev-postgres"
+  #   command: ["./wait-for-it.sh", "db:5432", "--", "npm", "start"]
+  test-redis:
     image: redis
     ports:
-      - 6379:6379
+      - 6380:6379
+  # dev-redis:
+  #   image: redis
+  #   ports:
+  #     - 6379:6379
   dev-postgres:
     image: postgres
     ports:

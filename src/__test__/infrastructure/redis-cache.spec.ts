@@ -24,4 +24,16 @@ describe("Redis cache.", () => {
     );
     expect(JSON.parse(cachedUser)).toStrictEqual(normalizeJson(user));
   });
+
+  it("user is deleted from cache after it is updated with put/:email.", async () => {
+    const user = getMockUsersArray(1)[0];
+    await insertUser(user);
+    await request(app).put(`${baseUrn}/${user.email}`);
+    const cachedUser = await testDbInstance._redisClient.asyncGet(
+      testDbInstance._redisClient._getEntryName("users", {
+        email: user.email,
+      })
+    );
+    expect(JSON.parse(cachedUser)).toStrictEqual(null);
+  });
 });
