@@ -37,9 +37,9 @@ export class Application {
     await this._db.init();
     if (process.env.NODE_ENV !== "test") {
       this._server = this._app.listen(
-        parseInt(process.env.PORT || "3000"),
+        parseInt(process.env.APP_PORT || "3000"),
         () => {
-          console.log(`Listening on port ${process.env.PORT}`);
+          console.log(`Listening on port ${process.env.APP_PORT}`);
         }
       );
     }

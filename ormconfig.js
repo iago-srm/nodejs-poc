@@ -24,6 +24,12 @@ module.exports=[{
   "port": process.env.POSTGRES_PORT_DEVELOPMENT,
   "database": "postgres",
   "name": 'development'
+  },{
+    ...commonConfig,
+  "host": process.env.POSTGRES_HOST,
+  "port": process.env.POSTGRES_PORT,
+  "database": "postgres",
+  "name": 'production'
   },
   {
   ...commonConfig,

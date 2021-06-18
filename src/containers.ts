@@ -50,13 +50,19 @@ rootContainer.register({
   userRouter: asFunction(makeUserRouter).classic(),
 });
 
-const devContainer = rootContainer.createScope();
+const container = rootContainer.createScope();
 const testContainer = rootContainer.createScope();
 
 const devContainerConfig = {
   dbConnectionName: dbConnectionNames.DEVELOPMENT,
   redisHost: process.env.REDIS_HOST_DEVELOPMENT,
   redisPort: process.env.REDIS_PORT_DEVELOPMENT,
+};
+
+const prodContainerConfig = {
+  dbConnectionName: dbConnectionNames.PRODUCTION,
+  redisHost: process.env.REDIS_HOST,
+  redisPort: process.env.REDIS_PORT,
 };
 
 const testContainerConfig = {
@@ -80,7 +86,13 @@ const registerScopeDependencies = (
   });
 };
 
-registerScopeDependencies(devContainer, devContainerConfig);
+registerScopeDependencies(
+  container,
+  process.env.NODE_ENV === "production"
+    ? prodContainerConfig
+    : devContainerConfig
+);
+
 registerScopeDependencies(testContainer, testContainerConfig);
 
-export { devContainer, testContainer };
+export { container as devContainer, testContainer };

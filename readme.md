@@ -22,14 +22,12 @@ Here is a rundown of the concepts and technologies this project makes use of.
 # Run it locally
 
 - It needs to run three containers simultaneously: redis, postgre and the app itself. Use the `docker-compose up` command to run all containers in the docker-compose.yaml file.
-  When running it for the first time, you'll need to run the command twice, for the db server to persist its configuration in its volume first. The app will successfully connect the second time (see [DB connection resiliance](#todo)).
-- In order to run the tests locally, you'll need NodeJS installed in your machine. Run the test suites with `npm run test`. It uses its own redis and postgres dbs, separated from the ones the app uses. See docker-compose.yaml.
+- In order to run the tests locally, you'll need NodeJS installed in your machine. Spin up redis and the db with `docker-compose -f docker-compose-test.yaml up`. Then run the test suites with `npm run test`.
 
 # TODO
 
 This is a work in progress. Here are my priorities moving forward
 
-- Write test for redis after PUT calls.
 - Figure out typeorm db migrations.
 - Internationalize _Error()_ messages.
 - CI/CD with Github Actions or Travis and run tests in a dedicated environment.
@@ -38,25 +36,19 @@ This is a work in progress. Here are my priorities moving forward
 My goal is to make this a proof-of-concept of a backend ready for a distributed systems environment. The following items are next in line in order to achieve that goal.
 
 - Auth middleware (from @iago-srm/common).
-- DB connection resiliance. There is no system in place to have the app retry the db connection in case it is severed, the app will just start to fail requests. Besides, if the db server is not ready to accept connections by the time the app tries to connect to it for the first time, there is no retry attempt.  
-  For now, when the app starts with docker-compose, the [`wait-for-it.sh` script](https://github.com/vishnubob/wait-for-it) prevents a first connection error if the db volume has already been created. If it hasn't yet and the databases still have to be created (first time db boots in the current machine), the script doesn't cut it. In that case, it is necessary to stop docker-compose and rerun it.
+- DB connection resiliance. There is no system in place to have the app retry the db connection in case it is severed, the app will just start to fail requests.
 - Obervability and health check. Probably with the [ELK stack](https://www.elastic.co/what-is/elk-stack).
 
 # Development
 
+- `docker-compose -f docker-compose-dev.yaml up` to pin up development db, redis and pgadmin.
 - `npm run dev` to start app
 - After each new environment variable created on '.env', run `npm run gen-env` to update .env.d.ts. That also updates .env.example (which is version-controlled).
 - `docker build -t iagosrm/nodejs-poc .` to redo app image after a change.
 
-## Accessing the databases
+## Database GUIs
 
 ## postgres
-
-### CLI
-
-- Acess container console: `docker exec -it nodejs-poc_dev-postgres_1 bash`.
-- When inside, type in `psql -h localhost -U postgres` in order to connect to db.
-- Once connceted, [psql commands](https://www.postgresqltutorial.com/psql-commands/) become available.
 
 ### pgAdmin
 
@@ -64,14 +56,6 @@ In the browser, "Add New Server" and write "dev-postgres" in "Host name/address"
 
 ## redis
 
-### CLI
-
-In the container terminal, run `redis-cli` to input commands.
-
-- `KEYS *` to get all keys.
-- `FLUSHALL` to delete all keys.
-- `exit` in order to exit both redis-cli and container's terminal.
-
 ### Redis-Commander
 
-Uncomment this container in the `docker-compose.yaml` to use [redis commander](https://github.com/joeferner/redis-commander). Uncomment the appropriate "environment" lines based on what redis servers you have running.
+Uncomment this container in the `docker-compose-dev.yaml` to use [redis commander](https://github.com/joeferner/redis-commander). Uncomment the appropriate "environment" lines based on what redis servers you have running.
