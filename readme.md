@@ -19,10 +19,19 @@ Here is a rundown of the concepts and technologies this project makes use of.
 - [Postgres](https://www.postgresql.org/) database.
 - [Express](https://expressjs.com/).
 
-# Run it locally
+# Run locally
 
-- It needs to run three containers simultaneously: redis, postgre and the app itself. Use the `docker-compose up` command to run all containers in the docker-compose.yaml file.
+- It needs to run three containers simultaneously: redis, postgre and the app itself. Use the `docker-compose up` command to run all containers in the docker-compose.yaml file. 
+
+# Test
 - In order to run the tests locally, you'll need NodeJS installed in your machine. Spin up redis and the db with `docker-compose -f docker-compose-test.yaml up`. Then run the test suites with `npm run test`.
+
+# Development
+
+- `docker-compose -f docker-compose-dev.yaml up` to spin up development db, redis and pgadmin.
+- `npm run dev` to start app
+- After each new environment variable created on '.env', run `npm run gen-env` to update .env.d.ts. That also updates .env.example (which is version-controlled).
+- `docker build -t iagosrm/nodejs-poc .` to redo app image after a change.
 
 # TODO
 
@@ -38,13 +47,6 @@ My goal is to make this a proof-of-concept of a backend ready for a distributed 
 - Auth middleware (from @iago-srm/common).
 - DB connection resiliance. There is no system in place to have the app retry the db connection in case it is severed, the app will just start to fail requests.
 - Obervability and health check. Probably with the [ELK stack](https://www.elastic.co/what-is/elk-stack).
-
-# Development
-
-- `docker-compose -f docker-compose-dev.yaml up` to pin up development db, redis and pgadmin.
-- `npm run dev` to start app
-- After each new environment variable created on '.env', run `npm run gen-env` to update .env.d.ts. That also updates .env.example (which is version-controlled).
-- `docker build -t iagosrm/nodejs-poc .` to redo app image after a change.
 
 ## Database GUIs
 
