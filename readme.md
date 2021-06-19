@@ -19,11 +19,16 @@ Here is a rundown of the concepts and technologies this project makes use of.
 - [Postgres](https://www.postgresql.org/) database.
 - [Express](https://expressjs.com/).
 
+# Branches
+
+- **no-cache**: Only main database, no Redis, for applications that don't need a cache layer.
+
 # Run locally
 
-- It needs to run three containers simultaneously: redis, postgre and the app itself. Use the `docker-compose up` command to run all containers in the docker-compose.yaml file. 
+- It needs to run three containers simultaneously: redis, postgre and the app itself. Use the `docker-compose up` command to run all containers in the docker-compose.yaml file.
 
 # Test
+
 - In order to run the tests locally, you'll need NodeJS installed in your machine. Spin up redis and the db with `docker-compose -f docker-compose-test.yaml up`. Then run the test suites with `npm run test`.
 
 # Development
