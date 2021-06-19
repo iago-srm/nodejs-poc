@@ -1,4 +1,4 @@
-export const UserMessageNames = {
+export const MessageNames = {
   USERNAME: {
     NOT_PROVIDED: "username_not_provided",
     NULL: "username_null",
@@ -17,5 +17,12 @@ export const UserMessageNames = {
   },
   ROLE: {
     INVALID_PATTERN: "role_pattern",
+  },
+  CONFIRMPASSWORD: {
+    NOT_PROVIDED: "confirm_password_not_provided",
+    DOES_NOT_MATCH: "confirm_password_does_not_match",
+  },
+  AUTHENTICATION: {
+    WRONG_CREDENTIALS: "wrong_credentials",
   },
 };

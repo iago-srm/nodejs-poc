@@ -1,6 +1,5 @@
 import { DatabaseError } from "@iagosrm/common";
 import { createConnection, Connection, UpdateResult } from "typeorm";
-import { logger } from "./logger";
 
 export interface IDatabase {
   _connection: any;
@@ -35,9 +34,6 @@ export class Database implements IDatabase {
 
   async init() {
     this._connection = await createConnection(this.dbConnectionName);
-    logger.info(
-      `Connection made: ${this._connection.name} - ${this._connection.driver.database}`
-    );
   }
 
   closeConnection() {

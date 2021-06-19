@@ -1,9 +1,9 @@
-import { start, deleteAll } from "./test.helpers";
+import { testAppInstance, testDbInstance } from "./helpers/instances";
 
 beforeAll(() => {
-  return start();
+  return testAppInstance.start();
 });
 
 beforeEach(() => {
-  return deleteAll();
+  return testDbInstance.deleteAll();
 });

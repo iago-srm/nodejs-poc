@@ -1,16 +1,40 @@
 import { User } from "@domain";
 import { IDatabase } from "@infrastructure";
+import { encrypt, compare } from "./encrypt";
 
-const tableName = "users";
+export const usersTableName = "users";
 export const UserUseCase = (db: IDatabase) => {
   return {
-    getUser: (email: string) => db.getOne<User>(tableName, { email }),
-    getAllUsers: () => db.getAll<User>(tableName),
-    insertUser: (user: User | User[]) => db.insert<User>(tableName, user),
-    updateUser: ({ email, password }: { email: string; password: string }) =>
-      db.updateOne<User>(tableName, { email }, { password }),
-    deleteUser: ({ email }: { email: string }) =>
-      db.delete(tableName, { email }),
+    getUserById: (user: User) =>
+      db.getOne<User>(usersTableName, {
+        id: user.id,
+      }),
+    getAllUsers: () => db.getAll<User>(usersTableName),
+    getUserByEmailAndPassword: async (user: User) => {
+      const retrievedUser = await db.getOne<User>(usersTableName, {
+        email: user.email,
+      });
+      if (retrievedUser) {
+        const validatePassword = await compare(
+          user.password,
+          retrievedUser.password
+        );
+        if (validatePassword) {
+          return retrievedUser;
+        }
+        return undefined;
+      }
+      return undefined;
+    },
+    insertUser: async (user: User) => {
+      const hashedUser = {
+        ...user,
+        password: await encrypt(user.password),
+      };
+      return db.insert<User>(usersTableName, hashedUser);
+    },
+    // updateUser: ({ id, password }: { id: string; password: string }) =>
+    //   db.updateOne<User>(tableName, id, { password }),
   };
 };
 

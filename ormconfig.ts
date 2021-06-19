@@ -1,5 +1,6 @@
 const commonConfig = {
   type: "postgres",
+  database: "postgres",
   logging: false,
   username: process.env.POSTGRES_USER,
   password: process.env.POSTGRES_PASSWORD,
@@ -19,21 +20,18 @@ module.exports = [
     ...commonConfig,
     host: process.env.POSTGRES_HOST_DEVELOPMENT,
     port: process.env.POSTGRES_PORT_DEVELOPMENT,
-    database: "postgres",
     name: "development",
   },
   {
     ...commonConfig,
     host: process.env.POSTGRES_HOST,
     port: process.env.POSTGRES_PORT,
-    database: "postgres",
     name: "production",
   },
   {
     ...commonConfig,
     host: process.env.POSTGRES_HOST_TEST,
     port: process.env.POSTGRES_PORT_TEST,
-    database: "postgres",
     name: "test",
   },
 ];

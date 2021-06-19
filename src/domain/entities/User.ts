@@ -6,18 +6,13 @@ import {
   Column,
 } from "typeorm";
 
-export enum UserRole {
-    ADMIN = "admin",
-    COMMON = "common",
-}
-
-@Entity('users')
+@Entity("users")
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
   @Column({ nullable: true })
-  username: string;
+  nickName: string;
 
   @Column({ unique: true })
   email: string;
@@ -25,16 +20,27 @@ export class User {
   @Column()
   password: string;
 
-  @Column({
-      type: "enum",
-      enum: UserRole,
-      default: UserRole.COMMON
-  })
-  role: UserRole
+  @Column({ nullable: true })
+  profilePictureUrl: string;
 
-  @CreateDateColumn({type: "timestamp"})
+  @Column({
+    default: 0,
+  })
+  tokenVersion: number;
+
+  @Column({
+    default: false,
+  })
+  isAdmin: boolean;
+
+  @Column({
+    default: false,
+  })
+  isPremium: boolean;
+
+  @CreateDateColumn({ type: "timestamp" })
   createdAt?: Date;
 
-  @UpdateDateColumn({type: "timestamp"})
+  @UpdateDateColumn({ type: "timestamp" })
   updatedAt?: Date;
 }

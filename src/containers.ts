@@ -1,18 +1,25 @@
-import { createContainer, asClass, asValue, asFunction } from "awilix";
 import { logger, Database } from "@infrastructure";
-import { UserUseCase } from "@application";
-import { makeUserRouter } from "@presentation";
+import {
+  createContainer,
+  asClass,
+  asValue,
+  asFunction,
+  AwilixContainer,
+} from "awilix";
+import { UserUseCase, TokenUseCase } from "@application";
+import { makeUserRouter, makeTokenRouter } from "@presentation";
 import { Application } from "./app";
 import { Messages } from "@locales";
 import { dbConnectionNames } from "../ormconfig.enum";
 
 export enum Dependencies {
   APP = "app",
+  TOKENUSECASE = "tokenUseCase",
   USERUSECASE = "userUseCase",
   DB = "db",
-  MIDDLEWARE = "middleware",
   LOGGER = "logger",
   USERROUTER = "userRouter",
+  TOKENROUTER = "tokenRouter",
   DBCONNECTIONNAME = "dbConnectionName",
 }
 
@@ -43,9 +50,11 @@ container.register({
 
   // register use cases
   [Dependencies.USERUSECASE]: asFunction(UserUseCase).classic(),
+  [Dependencies.TOKENUSECASE]: asFunction(TokenUseCase).classic(),
 
   // register routers
   [Dependencies.USERROUTER]: asFunction(makeUserRouter).classic(),
+  [Dependencies.TOKENROUTER]: asFunction(makeTokenRouter).classic(),
 });
 
 export { container };

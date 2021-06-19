@@ -1,7 +1,7 @@
 version: "3"
 
 services:
-  postgres:
+  test-postgres:
     image: postgres
     ports:
       - "5435:5432"

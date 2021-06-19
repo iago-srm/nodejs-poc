@@ -4,12 +4,12 @@ services:
   postgres:
     image: postgres
     ports:
-      - "5434:5432"
+      - "5433:5432"
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=mysecretpassword
     volumes:
-      - ${HOME}/nodejs-poc-postgres-data/:/var/lib/postgresql/data
+      - ${HOME}/auth-postgres-data/:/var/lib/postgresql/data
   pgadmin:
     image: dpage/pgadmin4
     ports:
