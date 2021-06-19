@@ -1,6 +1,6 @@
 import { DatabaseError } from "@iagosrm/common";
 import { createConnection, Connection, UpdateResult } from "typeorm";
-// import { IDatabase } from "@domain";
+import { logger } from "./logger";
 
 export interface IDatabase {
   _connection: any;
@@ -21,18 +21,23 @@ export interface IDatabase {
 
 export interface DatabaseParams {
   dbConnectionName: string;
+  logger: any;
 }
 
 export class Database implements IDatabase {
   _connection: Connection;
   dbConnectionName: string;
 
-  constructor({ dbConnectionName }: DatabaseParams) {
+  constructor({ dbConnectionName, logger }: DatabaseParams) {
+    logger.info(`db going to connect to "${dbConnectionName}"`);
     this.dbConnectionName = dbConnectionName;
   }
 
   async init() {
     this._connection = await createConnection(this.dbConnectionName);
+    logger.info(
+      `Connection made: ${this._connection.name} - ${this._connection.driver.database}`
+    );
   }
 
   closeConnection() {

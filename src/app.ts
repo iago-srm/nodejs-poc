@@ -1,9 +1,10 @@
 import express, { Express, RequestHandler, Router } from "express";
 import "express-async-errors";
 import { NotFoundError } from "@iagosrm/common";
-import { logger, RedisProxy } from "@infrastructure";
+import { logger, Database } from "@infrastructure";
 import http, { Server as HttpServer } from "http";
 import https, { Server as HttpsServer } from "https";
+import { Server } from "http";
 import helmet from "helmet";
 import cors from "cors";
 import { json } from "body-parser";
@@ -15,14 +16,14 @@ import { Messages } from "@locales";
 
 interface ApplicationParams {
   userRouter: Router;
-  db: RedisProxy;
   logger;
+  db: Database;
 }
 
 export class Application {
   _app: Express;
-  _db: RedisProxy;
   _server: HttpServer | HttpsServer;
+  _db: Database;
   baseUrn = "api/v1";
   _logger: any;
   _io: WSServer;
@@ -94,7 +95,7 @@ export class Application {
       await this._db.init();
     } catch (e) {
       logger.error(
-        `There was an error connecting to the database: ${e.message}`
+        `There was an error connecting to the database: ${e.message}. Attempted to connect to ${this._db._connection?.name}`
       );
     }
     if (process.env.NODE_ENV !== "test") {
