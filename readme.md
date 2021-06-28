@@ -1,7 +1,7 @@
 # What this is
 
 This is a NodeJS backend server _proof-of-concept_. I have implemented many of the most useful features you'd want in a backend server (see [this part](#why-it-is-cool)).  
-In order to make this the code of a real project, all you have to do is add your own business entities (I have implemented a "user" entity) and choose the features you need, by removing features from the code and/or adding new ones (hopefully, as the project progresses, having to add new features to implement real projects will happen less often).
+In order to make this the code of a real project, all you have to do is add your own business entities (I have implemented a meaningless "user" entity, this is not an auth service) and choose the features you need, by removing features from the code and/or adding new ones (hopefully, as the project progresses, having to add new features to implement real projects will happen less often).
 
 # Why it is cool
 
@@ -11,11 +11,11 @@ Here is a rundown of the concepts and technologies this project makes use of.
 - [Clean Architecture](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html).
 - [Typescript](https://www.typescriptlang.org/) (along with [ts-node-dev](https://www.npmjs.com/package/ts-node-dev) for development).
 - Cache layer with [Redis](https://redis.io/).
-- [Docker](https://www.docker.com/). App is dockerized, and uses a docker-compose.yaml to boot up the postgres and redis dbs as well as pgadmin in a custom local network.
+- [Docker](https://www.docker.com/). App is dockerized, and uses different docker-compose.yaml files to boot up dependent services, such as the postgres and redis dbs as well as pgadmin in a custom local network.
+- Integration tests of all routes with [Jest](https://jestjs.io/).
 - Internationalized validation messages.
 - Validation of body and query parameters on all routes with [express-validator](https://express-validator.github.io/docs/).
-- Integration tests of all routes with [Jest](https://jestjs.io/).
-- [TypeORM](https://typeorm.io/#/).
+- [TypeORM](https://typeorm.io/#/) to connect to Postgres.
 - [Postgres](https://www.postgresql.org/) database.
 - [Express](https://expressjs.com/).
 
@@ -29,11 +29,11 @@ Here is a rundown of the concepts and technologies this project makes use of.
 
 # Test
 
-- In order to run the tests locally, you'll need NodeJS installed in your machine. Spin up redis and the db with `docker-compose -f docker-compose-test.yaml up`. Then run the test suites with `npm run test`.
+- In order to run the tests locally, you'll need NodeJS installed in your machine. Spin up redis and the db with `npm run docker-test`. Then run the test suites with `npm run test`.
 
 # Development
 
-- `docker-compose -f docker-compose-dev.yaml up` to spin up development db, redis and pgadmin.
+- `npm run docker-dev` to spin up development db, redis and pgadmin.
 - `npm run dev` to start app
 - After each new environment variable created on '.env', run `npm run gen-env` to update .env.d.ts. That also updates .env.example (which is version-controlled).
 - `docker build -t iagosrm/nodejs-poc .` to redo app image after a change.
