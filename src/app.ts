@@ -45,7 +45,7 @@ export class Application {
     this._app.disable("x-powered-by");
 
     // Routers
-    this._app.use(`${this.baseUrn}/users`, userRouter);
+    this._app.use(`/${this.baseUrn}/users`, userRouter);
 
     this._app.all("*", () => {
       throw new NotFoundError();
