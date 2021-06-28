@@ -16,6 +16,6 @@ declare namespace NodeJS {
     POSTGRES_USER: string;
     POSTGRES_PASSWORD: string;
     HOME: string;
-    BASE_URN: string;
+    CORS_ALLOW: string;
   }
 }

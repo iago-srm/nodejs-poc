@@ -4,8 +4,8 @@ import { NotFoundError } from "@iagosrm/common";
 import { __prod__ } from "./constants";
 import { RedisProxy } from "@infrastructure";
 import { Server } from "http";
-
-const baseUrn = process.env.BASE_URN;
+import helmet from "helmet";
+import cors from "cors";
 
 interface ApplicationParams {
   middleware: { [key: string]: RequestHandler };
@@ -17,14 +17,35 @@ export class Application {
   _app: Express;
   _db: RedisProxy;
   _server: Server;
+  baseUrn = "api/v1";
 
   constructor({ middleware, userRouter, db }: ApplicationParams) {
     this._app = express();
     this._db = db;
+
+    // CORS
+    const allowlist = process.env.CORS_ALLOW?.split(" ");
+    const corsOptionsDelegate = function (req, callback) {
+      let corsOptions;
+      if (allowlist?.indexOf(req.header("Origin")) !== -1) {
+        corsOptions = { origin: true }; // reflect (enable) the requested origin in the CORS response
+      } else {
+        corsOptions = { origin: false }; // disable CORS for this request
+      }
+      callback(null, corsOptions); // callback expects two parameters: error and options
+    };
+    this._app.use(cors(corsOptionsDelegate));
+
+    //Middleware
     this._app.use(middleware.json);
     this._app.use(middleware.polyglot);
 
-    this._app.use(`${baseUrn}/users`, userRouter);
+    // Security
+    this._app.use(helmet());
+    this._app.disable("x-powered-by");
+
+    // Routers
+    this._app.use(`${this.baseUrn}/users`, userRouter);
 
     this._app.all("*", () => {
       throw new NotFoundError();
