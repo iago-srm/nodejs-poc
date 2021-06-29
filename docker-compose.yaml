@@ -4,12 +4,11 @@ services:
   app:
     image: iagosrm/nodejs-poc
     ports:
-      - 3000:3000
+      - 3006:3006
     depends_on:
       postgres:
         condition: service_healthy
-    command: ["./wait-for-it.sh", "db:5432", "--", "npm", "start"]
-
+    command: ["npm", "start"]
   redis:
     image: redis
     ports:
@@ -23,9 +22,16 @@ services:
       - POSTGRES_PASSWORD=mysecretpassword
       - POSTGRES_DB=test
     volumes:
-      - ${HOME}/postgres-data/:/var/lib/postgresql/data
+      - ${HOME}/nodejs-poc-postgres-data/:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 5s
       timeout: 5s
       retries: 5
+  pgadmin:
+    image: dpage/pgadmin4
+    ports:
+      - 80:80
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=user@domain.local
+      - PGADMIN_DEFAULT_PASSWORD=SuperSecret

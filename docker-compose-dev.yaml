@@ -13,8 +13,7 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=mysecretpassword
     volumes:
-      - ${HOME}/postgres-data-dev/:/var/lib/postgresql/data
-
+      - ${HOME}/nodejs-poc-postgres-data/:/var/lib/postgresql/data
   pgadmin:
     image: dpage/pgadmin4
     ports:
