@@ -25,7 +25,7 @@ Here is a rundown of the concepts and technologies this project makes use of.
 
 # Run locally
 
-- It needs to run three containers simultaneously: redis, postgre and the app itself. Use the `docker compose up` command to run all containers in the docker-compose.yaml file.
+- It needs to run three containers simultaneously: redis, postgre and the app itself. Use the `docker-compose up` command to run all containers in the docker-compose.yaml file.
 
 # Test
 
