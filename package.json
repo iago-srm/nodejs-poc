@@ -72,7 +72,7 @@
     "typescript": "^4.3.2"
   },
   "dependencies": {
-    "@iagosrm/common": "^1.0.10",
+    "@iagosrm/common": "^1.0.16",
     "awilix": "^4.3.4",
     "body-parser": "^1.19.0",
     "cors": "^2.8.5",
