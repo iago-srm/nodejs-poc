@@ -2,26 +2,33 @@ import express, { Express, RequestHandler, Router } from "express";
 import "express-async-errors";
 import { NotFoundError } from "@iagosrm/common";
 import { __prod__ } from "./constants";
-import { RedisProxy } from "@infrastructure";
-import { Server } from "http";
+import { logger, RedisProxy } from "@infrastructure";
+import { Server as HttpServer } from "http";
+import { Server as HttpsServer } from "https";
 import helmet from "helmet";
 import cors from "cors";
+import { json } from "body-parser";
+import fs from "fs";
+import https from "https";
+import { AddressInfo } from "net";
 
 interface ApplicationParams {
   middleware: { [key: string]: RequestHandler };
   userRouter: Router;
   db: RedisProxy;
+  logger;
 }
 
 export class Application {
   _app: Express;
   _db: RedisProxy;
-  _server: Server;
+  _server: HttpServer | HttpsServer;
   baseUrn = "api/v1";
-
-  constructor({ middleware, userRouter, db }: ApplicationParams) {
+  _logger: any;
+  constructor({ middleware, userRouter, db, logger }: ApplicationParams) {
     this._app = express();
     this._db = db;
+    this._logger = logger;
 
     // CORS
     const allowlist = process.env.CORS_ALLOW?.split(" ");
@@ -37,7 +44,7 @@ export class Application {
     this._app.use(cors(corsOptionsDelegate));
 
     //Middleware
-    this._app.use(middleware.json);
+    this._app.use(json());
     this._app.use(middleware.polyglot);
 
     // Security
@@ -54,15 +61,44 @@ export class Application {
     this._app.use(middleware.errorHandler);
   }
 
+  async _secureStart() {
+    const localHostSSL = {
+      key: fs.readFileSync("./certificates/key.pem"),
+      cert: fs.readFileSync("./certificates/cert.pem"),
+    };
+    this._server = https.createServer(localHostSSL, this._app);
+    const start = () => {
+      const { address, port } = this._server.address() as AddressInfo;
+      this._logger.info(`Secure app running at ${address}:${port}`);
+    };
+    this._server.listen(parseInt(process.env.APP_PORT || "43"), start);
+  }
+
+  async _nonSecureStart() {
+    this._server = this._app.listen(
+      parseInt(process.env.APP_PORT || "3000"),
+      () => {
+        const { address, port } = this._server.address() as AddressInfo;
+        this._logger.info(`App running at ${address}:${port}`);
+      }
+    );
+  }
+
   async start() {
-    await this._db.init();
-    if (process.env.NODE_ENV !== "test") {
-      this._server = this._app.listen(
-        parseInt(process.env.APP_PORT || "3000"),
-        () => {
-          console.log(`Listening on port ${process.env.APP_PORT}`);
-        }
+    try {
+      await this._db.init();
+    } catch (e) {
+      logger.error(
+        `There was an error connecting to the database: ${e.message}`
       );
+    }
+    if (process.env.NODE_ENV !== "test") {
+      try {
+        await this._secureStart();
+      } catch (e) {
+        logger.error(`Secure start failed due to error: ${e.message}`);
+        await this._nonSecureStart();
+      }
     }
   }
 

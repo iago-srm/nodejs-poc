@@ -5,19 +5,17 @@ import {
   asFunction,
   AwilixContainer,
 } from "awilix";
-import { json } from "body-parser";
 import { errorHandler, startPolyglot } from "@iagosrm/common";
 
-import { RedisProxy } from "@infrastructure";
+import { RedisProxy, logger, createRedisClient } from "@infrastructure";
 import { UserUseCase } from "@application";
 import { makeUserRouter } from "@presentation";
 import { Application } from "./app";
+// import { SecureApplication } from "./secure-app";
 import { Messages } from "@locales";
-import { createRedisClient } from "@infrastructure";
 import { dbConnectionNames } from "../ormconfig.enum";
 
 export enum MiddlewareNames {
-  json = "json",
   polyglot = "polyglot",
   errorHandler = "errorHandler",
 }
@@ -26,23 +24,27 @@ export enum Dependencies {
   APP = "app",
   USERUSECASE = "userUseCase",
   DB = "db",
+  MIDDLEWARE = "middleware",
+  SECURE_APP = "secureApp",
 }
 
 const rootContainer = createContainer();
 
 rootContainer.register({
-  db: asClass(RedisProxy)
+  [Dependencies.DB]: asClass(RedisProxy)
     .singleton()
     .disposer(async (db) => await db.closeConnection()),
   [Dependencies.APP]: asClass(Application)
     .singleton()
     .disposer(async (app) => await app._server.close()),
-  middleware: asValue({
+  [Dependencies.MIDDLEWARE]: asValue({
     [MiddlewareNames.errorHandler]: errorHandler,
     [MiddlewareNames.polyglot]: startPolyglot(Messages),
-    [MiddlewareNames.json]: json(),
   }),
-
+  logger: asValue(logger),
+  // [Dependencies.SECURE_APP]: asClass(SecureApplication)
+  //   .singleton()
+  //   .disposer(async (app) => await app._server.close()),
   // register use cases
   [Dependencies.USERUSECASE]: asFunction(UserUseCase).classic(),
 

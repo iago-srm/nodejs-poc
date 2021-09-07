@@ -43,7 +43,6 @@ Here is a rundown of the concepts and technologies this project makes use of.
 This is a work in progress. Here are my priorities moving forward
 
 - Figure out typeorm db migrations.
-- Internationalize _Error()_ messages.
 - CI/CD with Github Actions or Travis and run tests in a dedicated environment.
 - Implement a branch with GraphQL.
 
@@ -66,3 +65,9 @@ In the browser, "Add New Server" and write "dev-postgres" in "Host name/address"
 ### Redis-Commander
 
 Uncomment this container in the `docker-compose-dev.yaml` to use [redis commander](https://github.com/joeferner/redis-commander). Uncomment the appropriate "environment" lines based on what redis servers you have running.
+
+## SSL
+
+### Generate certificates on Windows
+
+Use Git Bash, and do `openssl genrsa -out certificates/key.pem` e, então, `openssl req -new -key certificates/key.pem -out certificates/csr.pem`. Depois de preencher as informações, fazer `openssl x509 -req -days 365 -in certificates/csr.pem -signkey certificates/key.pem -out certificates/cert.pem`

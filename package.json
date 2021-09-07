@@ -1,7 +1,7 @@
 {
   "name": "nodejs-poc",
   "version": "1.0.0",
-  "description": "",
+  "description": "A proof of concept of a very complete NodeJS API",
   "main": "index.js",
   "scripts": {
     "generate-initial-migration": "npx typeorm migration:generate -n Initial",
@@ -10,8 +10,8 @@
     "dev": "cross-env NODE_ENV=development ts-node-dev --transpile-only --inspect=4321 --respawn -r tsconfig-paths/register src/index.ts",
     "start": "cross-env NODE_ENV=production node -r ts-node/register/transpile-only -r tsconfig-paths/register dist/src/index.js",
     "test": "cross-env NODE_ENV=test jest --watchAll --no-cache --runInBand",
-    "docker-dev": "docker-compose -f docker-compose-dev.yaml up",
-    "docker-test": "docker-compose -f docker-compose-test.yaml up"
+    "docker:dev": "docker-compose -f docker-compose-dev.yaml up",
+    "docker:test": "docker-compose -f docker-compose-test.yaml up"
   },
   "jest": {
     "preset": "ts-jest",
@@ -57,6 +57,7 @@
     "@types/jest": "^26.0.21",
     "@types/node": "^14.17.3",
     "@types/node-polyglot": "^2.4.1",
+    "@types/pino": "^6.3.11",
     "@types/redis": "^2.8.29",
     "@types/supertest": "^2.0.10",
     "cross-env": "^7.0.3",
@@ -80,6 +81,8 @@
     "express-async-errors": "^3.1.1",
     "helmet": "^4.6.0",
     "pg": "^8.5.1",
+    "pino": "^6.13.2",
+    "pino-pretty": "^6.0.0",
     "redis": "^3.0.2",
     "reflect-metadata": "^0.1.13",
     "ts-node": "^9.1.1",
