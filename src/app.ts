@@ -3,14 +3,14 @@ import "express-async-errors";
 import { NotFoundError } from "@iagosrm/common";
 import { __prod__ } from "./constants";
 import { logger, RedisProxy } from "@infrastructure";
-import { Server as HttpServer } from "http";
-import { Server as HttpsServer } from "https";
+import http, { Server as HttpServer } from "http";
+import https, { Server as HttpsServer } from "https";
 import helmet from "helmet";
 import cors from "cors";
 import { json } from "body-parser";
 import fs from "fs";
-import https from "https";
 import { AddressInfo } from "net";
+import { Server as WSServer } from "socket.io";
 
 interface ApplicationParams {
   middleware: { [key: string]: RequestHandler };
@@ -25,6 +25,8 @@ export class Application {
   _server: HttpServer | HttpsServer;
   baseUrn = "api/v1";
   _logger: any;
+  _io: WSServer;
+
   constructor({ middleware, userRouter, db, logger }: ApplicationParams) {
     this._app = express();
     this._db = db;
@@ -61,12 +63,16 @@ export class Application {
     this._app.use(middleware.errorHandler);
   }
 
+  _setIOServer = (server) => {
+    this._io = new WSServer(server);
+  };
   async _secureStart() {
     const localHostSSL = {
       key: fs.readFileSync("./certificates/key.pem"),
       cert: fs.readFileSync("./certificates/cert.pem"),
     };
     this._server = https.createServer(localHostSSL, this._app);
+    this._setIOServer(this._server);
     const start = () => {
       const { address, port } = this._server.address() as AddressInfo;
       this._logger.info(`Secure app running at ${address}:${port}`);
@@ -75,13 +81,12 @@ export class Application {
   }
 
   async _nonSecureStart() {
-    this._server = this._app.listen(
-      parseInt(process.env.APP_PORT || "3000"),
-      () => {
-        const { address, port } = this._server.address() as AddressInfo;
-        this._logger.info(`App running at ${address}:${port}`);
-      }
-    );
+    this._server = http.createServer(this._app);
+    this._setIOServer(this._server);
+    this._server.listen(parseInt(process.env.APP_PORT || "3000"), () => {
+      const { address, port } = this._server.address() as AddressInfo;
+      this._logger.info(`App running at ${address}:${port}`);
+    });
   }
 
   async start() {
