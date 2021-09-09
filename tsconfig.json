@@ -38,7 +38,7 @@
   },
   "exclude": [
     "node_modules",
-    "./src/__test__"
+    // "./src/__test__"
   ],
   "include": [
     "./src/**/*.tsx",

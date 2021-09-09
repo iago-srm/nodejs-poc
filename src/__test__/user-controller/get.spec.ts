@@ -1,17 +1,14 @@
 import request from "supertest";
-import { getMockUsersArray } from "../mock-data";
 import { getInvalidRandomEmail } from "@iagosrm/common";
+import { User } from "@domain";
+import { baseUrn, testDbInstance, testAppInstance } from "../setup";
 import { normalizeJsonArray, normalizeJson } from "../test.helpers";
-import { baseUrn } from "../setup";
-import { testContainer, Dependencies } from "../../containers";
-import { IUserUseCase } from "@application";
-import { testAppInstance } from "../setup";
+import { getMockUsersArray } from "../mock-data";
 
 const app = testAppInstance._app;
-const userUseCase: IUserUseCase = testContainer.resolve(
-  Dependencies.USERUSECASE
-);
-const { insertUser } = userUseCase;
+const insertUser = (users: User[]) => {
+  return testDbInstance._connection.getRepository("users").save(users);
+};
 
 describe("GET users/ :: Route lists all users.", () => {
   it("Route returns 200 OK status code.", async () => {
@@ -43,17 +40,17 @@ describe("GET users/ :: Route lists all users.", () => {
 
 describe("GET users/:email :: Route gets one user by email", () => {
   it("Route returns 200 OK status code.", async () => {
-    const user = getMockUsersArray(1)[0];
+    const user = getMockUsersArray(1);
     await insertUser(user);
-    const response = await request(app).get(`${baseUrn}/${user.email}`);
+    const response = await request(app).get(`${baseUrn}/${user[0].email}`);
     expect(response.status).toBe(200);
   });
 
   it("Route successfully returns user.", async () => {
-    const user = getMockUsersArray(1)[0];
+    const user = getMockUsersArray(1);
     await insertUser(user);
-    const response = await request(app).get(`${baseUrn}/${user.email}`);
-    expect({ ...response.body.user }).toMatchObject(normalizeJson(user));
+    const response = await request(app).get(`${baseUrn}/${user[0].email}`);
+    expect({ ...response.body.user }).toMatchObject(normalizeJson(user[0]));
   });
 
   it("Route returns 404 error when user is not found", async () => {

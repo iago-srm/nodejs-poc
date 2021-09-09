@@ -11,21 +11,23 @@ import { RedisProxy, logger, createRedisClient } from "@infrastructure";
 import { UserUseCase } from "@application";
 import { makeUserRouter } from "@presentation";
 import { Application } from "./app";
-// import { SecureApplication } from "./secure-app";
 import { Messages } from "@locales";
 import { dbConnectionNames } from "../ormconfig.enum";
 
-export enum MiddlewareNames {
-  polyglot = "polyglot",
-  errorHandler = "errorHandler",
-}
+// export enum MiddlewareNames {
+//   polyglot = "polyglot",
+//   errorHandler = "errorHandler",
+// }
 
 export enum Dependencies {
   APP = "app",
   USERUSECASE = "userUseCase",
   DB = "db",
   MIDDLEWARE = "middleware",
-  SECURE_APP = "secureApp",
+  LOGGER = "logger",
+  USERROUTER = "userRouter",
+  DBCONNECTIONNAME = "dbConnectionName",
+  REDISCLIENT = "redisClient",
 }
 
 const rootContainer = createContainer();
@@ -37,19 +39,17 @@ rootContainer.register({
   [Dependencies.APP]: asClass(Application)
     .singleton()
     .disposer(async (app) => await app._server.close()),
-  [Dependencies.MIDDLEWARE]: asValue({
-    [MiddlewareNames.errorHandler]: errorHandler,
-    [MiddlewareNames.polyglot]: startPolyglot(Messages),
-  }),
-  logger: asValue(logger),
-  // [Dependencies.SECURE_APP]: asClass(SecureApplication)
-  //   .singleton()
-  //   .disposer(async (app) => await app._server.close()),
+  // [Dependencies.MIDDLEWARE]: asValue({
+  //   [MiddlewareNames.errorHandler]: errorHandler,
+  //   [MiddlewareNames.polyglot]: startPolyglot(Messages),
+  // }),
+  [Dependencies.LOGGER]: asValue(logger),
+
   // register use cases
   [Dependencies.USERUSECASE]: asFunction(UserUseCase).classic(),
 
   // register routers
-  userRouter: asFunction(makeUserRouter).classic(),
+  [Dependencies.USERROUTER]: asFunction(makeUserRouter).classic(),
 });
 
 const container = rootContainer.createScope();
@@ -78,8 +78,8 @@ const registerScopeDependencies = (
   config: any
 ) => {
   scopeContainer.register({
-    dbConnectionName: asValue(config.dbConnectionName),
-    redisClient: asFunction(createRedisClient).inject(() => {
+    [Dependencies.DBCONNECTIONNAME]: asValue(config.dbConnectionName),
+    [Dependencies.REDISCLIENT]: asFunction(createRedisClient).inject(() => {
       return {
         host: config.redisHost,
         port: config.redisPort,

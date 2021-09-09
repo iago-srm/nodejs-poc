@@ -11,6 +11,8 @@ import { json } from "body-parser";
 import fs from "fs";
 import { AddressInfo } from "net";
 import { Server as WSServer } from "socket.io";
+import { errorHandler, startPolyglot } from "@iagosrm/common";
+import { Messages } from "@locales";
 
 interface ApplicationParams {
   middleware: { [key: string]: RequestHandler };
@@ -27,7 +29,7 @@ export class Application {
   _logger: any;
   _io: WSServer;
 
-  constructor({ middleware, userRouter, db, logger }: ApplicationParams) {
+  constructor({ userRouter, db, logger }: ApplicationParams) {
     this._app = express();
     this._db = db;
     this._logger = logger;
@@ -47,7 +49,7 @@ export class Application {
 
     //Middleware
     this._app.use(json());
-    this._app.use(middleware.polyglot);
+    this._app.use(startPolyglot(Messages));
 
     // Security
     this._app.use(helmet());
@@ -60,7 +62,7 @@ export class Application {
       throw new NotFoundError();
     });
 
-    this._app.use(middleware.errorHandler);
+    this._app.use(errorHandler);
   }
 
   _setIOServer = (server) => {
