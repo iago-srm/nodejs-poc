@@ -25,3 +25,5 @@ export const createRedisClient = (args: { host: string; port: number }) => {
   const { host, port } = args;
   return new AsyncRedis({ host, port });
 };
+
+export default AsyncRedis;

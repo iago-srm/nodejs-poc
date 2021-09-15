@@ -15,7 +15,6 @@ import { errorHandler, startPolyglot } from "@iagosrm/common";
 import { Messages } from "@locales";
 
 interface ApplicationParams {
-  middleware: { [key: string]: RequestHandler };
   userRouter: Router;
   db: RedisProxy;
   logger;

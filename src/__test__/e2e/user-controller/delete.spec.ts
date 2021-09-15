@@ -1,20 +1,20 @@
 import request from "supertest";
-import { testContainer, Dependencies } from "../../containers";
+import { testContainer, Dependencies } from "../../../containers";
 import { IUserUseCase } from "@application";
-import { UserMessageNames, UserMessages } from "../../locales";
-import { getMockUsersArray } from "../mock-data";
-import { baseUrn } from "../setup";
-import { testAppInstance } from "../setup";
+import { UserMessageNames, UserMessages } from "../../../locales";
+import { getMockUsersArray } from "../../mock-data";
+import {
+  testAppInstance,
+  baseUrn,
+  insertUser,
+  getUser,
+} from "../../test.helpers";
 
 const app = testAppInstance._app;
-const userUseCase: IUserUseCase = testContainer.resolve(
-  Dependencies.USERUSECASE
-);
-const { insertUser, getUser } = userUseCase;
 
 describe("DELETE users/:email :: Route deletes user by email", () => {
   it("Route returns 200 OK status code if user exists.", async () => {
-    const user = getMockUsersArray(1)[0];
+    const user = getMockUsersArray(1);
     const insertedUsers = await insertUser(user);
     if (insertedUsers[0]) {
       const response = await request(app).del(
@@ -33,7 +33,7 @@ describe("DELETE users/:email :: Route deletes user by email", () => {
   });
 
   it("Successfully deletes user from database.", async () => {
-    const user = getMockUsersArray(1)[0];
+    const user = getMockUsersArray(1);
     const insertedUsers = await insertUser(user);
     if (insertedUsers[0]) {
       await request(app).del(`${baseUrn}/${insertedUsers[0].email}`);
@@ -64,13 +64,13 @@ describe("DELETE users/:email :: Route deletes user by email", () => {
     ])(
       `VALIDATION(${lang}): When %s field is %s, returns \"%s\" message`,
       async (field, value, expectedMessage) => {
-        const user = getMockUsersArray(1)[0];
+        const user = getMockUsersArray(1);
         const insertedUsers = await insertUser(user);
         if (insertedUsers[0]) {
           if (value === "none") delete (user as any)[field];
           else (user as any)[field] = value;
           const response = await request(app)
-            .del(`${baseUrn}/${user.email}`)
+            .del(`${baseUrn}/${user[0].email}`)
             .set("Accept-Language", lang);
           expect(response.body.errors[0].message).toBe(expectedMessage);
           expect(response.status).toBe(400);

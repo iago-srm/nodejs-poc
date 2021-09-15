@@ -96,5 +96,8 @@ registerScopeDependencies(
 );
 
 registerScopeDependencies(testContainer, testContainerConfig);
-
+// testContainer.register({
+//   [Dependencies.DBCONNECTIONNAME]: asValue(dbConnectionNames.TEST),
+//   [Dependencies.REDISCLIENT]: asClass(jest.mock('./infrastructure/'))
+// });
 export { container as devContainer, testContainer };

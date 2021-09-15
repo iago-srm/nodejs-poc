@@ -1,14 +1,17 @@
 import request from "supertest";
 import { getInvalidRandomEmail } from "@iagosrm/common";
 import { User } from "@domain";
-import { baseUrn, testDbInstance, testAppInstance } from "../setup";
-import { normalizeJsonArray, normalizeJson } from "../test.helpers";
-import { getMockUsersArray } from "../mock-data";
+import {
+  normalizeJsonArray,
+  normalizeJson,
+  baseUrn,
+  testDbInstance,
+  testAppInstance,
+  insertUser,
+} from "../../test.helpers";
+import { getMockUsersArray } from "../../mock-data";
 
 const app = testAppInstance._app;
-const insertUser = (users: User[]) => {
-  return testDbInstance._connection.getRepository("users").save(users);
-};
 
 describe("GET users/ :: Route lists all users.", () => {
   it("Route returns 200 OK status code.", async () => {

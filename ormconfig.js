@@ -34,8 +34,6 @@ module.exports=[{
   {
   ...commonConfig,
   "name": "test",
-  "host": process.env.POSTGRES_HOST_TEST,
-  "port": process.env.POSTGRES_PORT_TEST,
-  "database": 'test'
+  "database": ':memory:'
   }
 ]

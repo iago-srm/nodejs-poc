@@ -1,41 +1,74 @@
+import { UserMessageNames, UserMessages } from "../../../locales";
 import request from "supertest";
-import { getMockUsersArray, getValidRandomPassword } from "../mock-data";
-import { UserMessageNames, UserMessages } from "../../locales";
-import { baseUrn } from "../setup";
-import { testContainer, Dependencies } from "../../containers";
+import { getMockUsersArray } from "../../mock-data";
+import { testContainer, Dependencies } from "../../../containers";
 import { IUserUseCase } from "@application";
-import { testAppInstance } from "../setup";
+import {
+  testAppInstance,
+  baseUrn,
+  insertUser,
+  getUser,
+} from "../../test.helpers";
 
 const app = testAppInstance._app;
-const userUseCase: IUserUseCase = testContainer.resolve(
-  Dependencies.USERUSECASE
-);
-const { insertUser, getUser } = userUseCase;
 
-describe("PUT users/:email :: Route updates user specified by e-mail.", () => {
+describe("POST users/ :: Route inserts a new user.", () => {
   it("Route returns 200 O status code.", async () => {
     const user = getMockUsersArray(1)[0];
-    await insertUser(user);
-    const response = await request(app).put(`${baseUrn}/${user.email}`).send({
-      password: getValidRandomPassword(),
-    });
+    const response = await request(app)
+      .post(baseUrn)
+      .send({ ...user });
     expect(response.status).toBe(200);
   });
 
-  it("Route successfully updates user password.", async () => {
+  it("Route returns no body.", async () => {
     const user = getMockUsersArray(1)[0];
+    const response = await request(app)
+      .post(baseUrn)
+      .send({ ...user });
+    expect(response.body).toEqual({});
+  });
+
+  it("New user is saved successfuly in database.", async () => {
+    const user = getMockUsersArray(1)[0];
+    await request(app)
+      .post(baseUrn)
+      .send({ ...user });
+    const savedUser = await getUser(user.email);
+    expect(savedUser).toEqual(expect.objectContaining(user));
+  });
+
+  it("Trying to save a user with a repeated e-mail returns 409 status code.", async () => {
+    const user = getMockUsersArray(1);
     await insertUser(user);
-    const newPassword = getValidRandomPassword();
-    await request(app).put(`${baseUrn}/${user.email}`).send({
-      password: newPassword,
-    });
-    const updatedUser = await getUser(user.email);
-    if (updatedUser) expect(updatedUser.password).toBe(newPassword);
-    else fail("failed to insert user to test.");
+    const response = await request(app)
+      .post(baseUrn)
+      .send({ ...user });
+    expect(response.status).toBe(409);
   });
 
   const testWithLang = (lang: string) =>
     it.each([
+      [
+        "username",
+        "none",
+        (UserMessages as any)[lang][UserMessageNames.USERNAME.NOT_PROVIDED],
+      ],
+      [
+        "username",
+        "a".repeat(2),
+        (UserMessages as any)[lang][UserMessageNames.USERNAME.INVALID_LENGTH],
+      ],
+      [
+        "username",
+        "a".repeat(35),
+        (UserMessages as any)[lang][UserMessageNames.USERNAME.INVALID_LENGTH],
+      ],
+      [
+        "username",
+        null,
+        (UserMessages as any)[lang][UserMessageNames.USERNAME.NULL],
+      ],
       [
         "password",
         "none",
@@ -69,13 +102,9 @@ describe("PUT users/:email :: Route updates user specified by e-mail.", () => {
       [
         "email",
         "none",
-        (UserMessages as any)[lang][UserMessageNames.EMAIL.INVALID_PATTERN],
+        (UserMessages as any)[lang][UserMessageNames.EMAIL.NOT_PROVIDED],
       ],
-      [
-        "email",
-        null,
-        (UserMessages as any)[lang][UserMessageNames.EMAIL.INVALID_PATTERN],
-      ],
+      ["email", null, (UserMessages as any)[lang][UserMessageNames.EMAIL.NULL]],
       [
         "email",
         "email",
@@ -88,7 +117,7 @@ describe("PUT users/:email :: Route updates user specified by e-mail.", () => {
         if (value === "none") delete (user as any)[field];
         else (user as any)[field] = value;
         const response = await request(app)
-          .put(`${baseUrn}/${user.email}`)
+          .post(baseUrn)
           .set("Accept-Language", lang)
           .send({ ...user });
         expect(response.body.errors[0].message).toBe(expectedMessage);

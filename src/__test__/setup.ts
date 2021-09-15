@@ -1,15 +1,7 @@
-import { testContainer, Dependencies } from "../containers";
-import { Application } from "../app";
-import { RedisProxy } from "@infrastructure";
+import { testContainer } from "../containers";
+import { testAppInstance, testDbInstance } from "./test.helpers";
 
-export const baseUrn = `/api/v1/users`;
-
-export const testAppInstance: Application = testContainer.resolve(
-  Dependencies.APP
-) as Application;
-export const testDbInstance: RedisProxy = testContainer.resolve(
-  Dependencies.DB
-);
+jest.mock("../infrastructure/redis-client");
 
 beforeAll(() => {
   return testAppInstance.start();
