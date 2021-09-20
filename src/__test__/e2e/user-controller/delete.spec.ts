@@ -1,6 +1,4 @@
 import request from "supertest";
-import { testContainer, Dependencies } from "../../../containers";
-import { IUserUseCase } from "@application";
 import { UserMessageNames, UserMessages } from "../../../locales";
 import { getMockUsersArray } from "../../mock-data";
 import {
@@ -37,7 +35,7 @@ describe("DELETE users/:email :: Route deletes user by email", () => {
     const insertedUsers = await insertUser(user);
     if (insertedUsers[0]) {
       await request(app).del(`${baseUrn}/${insertedUsers[0].email}`);
-      const insertedUser = await getUser(insertedUsers[0].email);
+      const insertedUser = (await getUser(insertedUsers[0].email))[0];
       expect(insertedUser).toBeFalsy();
     } else {
       fail("Could not successfully insert test user.");
@@ -67,8 +65,8 @@ describe("DELETE users/:email :: Route deletes user by email", () => {
         const user = getMockUsersArray(1);
         const insertedUsers = await insertUser(user);
         if (insertedUsers[0]) {
-          if (value === "none") delete (user as any)[field];
-          else (user as any)[field] = value;
+          if (value === "none") delete (user[0] as any)[field];
+          else (user[0] as any)[field] = value;
           const response = await request(app)
             .del(`${baseUrn}/${user[0].email}`)
             .set("Accept-Language", lang);

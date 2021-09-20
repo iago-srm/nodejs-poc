@@ -1,7 +1,6 @@
 import express, { Express, RequestHandler, Router } from "express";
 import "express-async-errors";
 import { NotFoundError } from "@iagosrm/common";
-import { __prod__ } from "./constants";
 import { logger, RedisProxy } from "@infrastructure";
 import http, { Server as HttpServer } from "http";
 import https, { Server as HttpsServer } from "https";

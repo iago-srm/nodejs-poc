@@ -1,8 +1,6 @@
 import { UserMessageNames, UserMessages } from "../../../locales";
 import request from "supertest";
 import { getMockUsersArray } from "../../mock-data";
-import { testContainer, Dependencies } from "../../../containers";
-import { IUserUseCase } from "@application";
 import {
   testAppInstance,
   baseUrn,
@@ -13,7 +11,7 @@ import {
 const app = testAppInstance._app;
 
 describe("POST users/ :: Route inserts a new user.", () => {
-  it("Route returns 200 O status code.", async () => {
+  it("Route returns 200 status code.", async () => {
     const user = getMockUsersArray(1)[0];
     const response = await request(app)
       .post(baseUrn)
@@ -34,7 +32,7 @@ describe("POST users/ :: Route inserts a new user.", () => {
     await request(app)
       .post(baseUrn)
       .send({ ...user });
-    const savedUser = await getUser(user.email);
+    const savedUser = (await getUser(user.email))[0];
     expect(savedUser).toEqual(expect.objectContaining(user));
   });
 
@@ -43,7 +41,7 @@ describe("POST users/ :: Route inserts a new user.", () => {
     await insertUser(user);
     const response = await request(app)
       .post(baseUrn)
-      .send({ ...user });
+      .send({ ...user[0] });
     expect(response.status).toBe(409);
   });
 

@@ -1,16 +1,11 @@
-import { testContainer } from "../containers";
-import { testAppInstance, testDbInstance } from "./test.helpers";
+import { start, deleteAll } from "./test.helpers";
 
-jest.mock("../infrastructure/redis-client");
+export const baseUrn = `/api/v1/users`;
 
 beforeAll(() => {
-  return testAppInstance.start();
+  return start();
 });
 
 beforeEach(() => {
-  return testDbInstance.deleteAll();
-});
-
-afterAll(() => {
-  return testContainer.dispose();
+  return deleteAll();
 });

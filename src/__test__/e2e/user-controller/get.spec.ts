@@ -1,11 +1,9 @@
 import request from "supertest";
 import { getInvalidRandomEmail } from "@iagosrm/common";
-import { User } from "@domain";
 import {
   normalizeJsonArray,
   normalizeJson,
   baseUrn,
-  testDbInstance,
   testAppInstance,
   insertUser,
 } from "../../test.helpers";
