@@ -9,40 +9,10 @@
     "build": "tsc",
     "dev": "cross-env NODE_ENV=development ts-node-dev --transpile-only --inspect=4321 --respawn -r tsconfig-paths/register src/index.ts",
     "start": "cross-env NODE_ENV=production node -r ts-node/register/transpile-only -r tsconfig-paths/register dist/src/index.js",
-    "test": "docker-compose -f docker-compose-test.yaml up --detach --force-recreate && cross-env NODE_ENV=test jest --watchAll --no-cache --runInBand",
+    "pretest": "docker-compose -f docker-compose-test.yaml up --detach --force-recreate",
+    "test": "cross-env NODE_ENV=test jest --watchAll --no-cache --runInBand",
+    "posttest": "docker container rm -f $(docker container ls -q -f name=nodejs-poc)",
     "docker:dev": "docker-compose -f docker-compose-dev.yaml up"
-  },
-  "jest": {
-    "preset": "ts-jest",
-    "testEnvironment": "node",
-    "rootDir": "src",
-    "setupFilesAfterEnv": [
-      "<rootDir>/__test__/setup.ts"
-    ],
-    "setupFiles": [
-      "dotenv/config"
-    ],
-    "moduleDirectories": [
-      "node_modules",
-      "src"
-    ],
-    "moduleNameMapper": {
-      "@presentation": [
-        "<rootDir>/presentation/index.ts"
-      ],
-      "@locales": [
-        "<rootDir>/locales/index.ts"
-      ],
-      "@infrastructure": [
-        "<rootDir>/infrastructure/index.ts"
-      ],
-      "@application": [
-        "<rootDir>/application/index.ts"
-      ],
-      "@domain": [
-        "<rootDir>/domain/index.ts"
-      ]
-    }
   },
   "keywords": [],
   "author": "",
