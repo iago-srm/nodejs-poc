@@ -32,6 +32,8 @@ module.exports = {
     ],
     "@domain": [
       "<rootDir>/domain/index.ts"
-    ]
+    ],
+    "@/(.*)": "<rootDir>/src$1"
+
   }
 };
