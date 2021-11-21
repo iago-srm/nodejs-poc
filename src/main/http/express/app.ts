@@ -1,7 +1,7 @@
 import express, { Express, RequestHandler, Router } from "express";
 import "express-async-errors";
 import { NotFoundError } from "@iagosrm/common";
-import { logger, RedisProxy } from "@infrastructure";
+import { logger, RedisProxy } from "src/frameworks";
 import http, { Server as HttpServer } from "http";
 import https, { Server as HttpsServer } from "https";
 import helmet from "helmet";
@@ -27,7 +27,7 @@ export class Application {
   _logger: any;
   _io: WSServer;
 
-  constructor({ userRouter, db, logger }: ApplicationParams) {
+  constructor({ db, logger }: ApplicationParams) {
     this._app = express();
     this._db = db;
     this._logger = logger;
@@ -54,7 +54,7 @@ export class Application {
     this._app.disable("x-powered-by");
 
     // Routers
-    this._app.use(`/${this.baseUrn}/users`, userRouter);
+    // this._app.use(`/${this.baseUrn}/users`, userRouter);
 
     this._app.all("*", () => {
       throw new NotFoundError();
@@ -90,13 +90,13 @@ export class Application {
   }
 
   async start() {
-    try {
-      await this._db.init();
-    } catch (e) {
-      logger.error(
-        `There was an error connecting to the database: ${e.message}`
-      );
-    }
+    // try {
+    //   await this._db.init();
+    // } catch (e) {
+    //   logger.error(
+    //     `There was an error connecting to the database: ${e.message}`
+    //   );
+    // }
     if (process.env.NODE_ENV !== "test") {
       try {
         await this._secureStart();

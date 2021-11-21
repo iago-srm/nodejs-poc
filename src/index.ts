@@ -1,7 +1,9 @@
 import "reflect-metadata";
-import "dotenv-safe/config";
-import { container, Dependencies } from "./containers";
-import { Application } from "./app";
+require('dotenv-safe').config({
+  allowEmptyValues: true
+});
+import { container, Dependencies } from "./main/containers";
+import { Application } from "./main/http/express/app";
 
 (async () => {
   const app: Application = container.resolve(Dependencies.APP);

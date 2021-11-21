@@ -1,7 +1,7 @@
-import { container as testContainer, Dependencies } from "../containers";
-import { Application } from "../app";
+import { container as testContainer, Dependencies } from "../main/containers";
+import { Application } from "../main/http/express/app";
 import { User } from "@domain";
-import { RedisProxy } from "@infrastructure";
+import { RedisProxy } from "src/frameworks";
 
 export const normalizeJsonArray = (arr: any[]) => {
   return arr.map((obj: any) => normalizeJson(obj));
