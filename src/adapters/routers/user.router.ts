@@ -6,13 +6,14 @@ import {
   getPasswordValidator,
   getUsernameValidator,
   getRoleValidator,
-} from "@presentation";
-import { IUserUseCase } from "@application";
+} from "src/adapters";
+// import { IUserUseCase } from "@application";
 import { User } from "@domain";
 
 const usernameRequired = true;
 
-export const makeUserRouter = (userUseCase: IUserUseCase) => {
+export const makeUserRouter = () => {
+  const userUseCase = {};
   const { getAllUsers, getUser, insertUser, updateUser, deleteUser } =
     userUseCase;
 
