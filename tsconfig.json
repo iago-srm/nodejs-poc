@@ -33,7 +33,10 @@
       "@locales": ["./src/locales/index.ts"],
       "@infrastructure": ["src/frameworks/index.ts"],
       "@application": ["./src/application/index.ts"],
-      "@domain": ["./src/domain/index.ts"]
+      "@domain": ["./src/domain/index.ts"],
+      "@/*": [
+        "*"
+      ]
     }
   },
   "exclude": [
