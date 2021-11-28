@@ -1,8 +1,21 @@
-type addProductsParams = {
-    productIds: [string];
-    cartId: string;
+export type CartItemDTO = {
+  id: string;
+  quantity: number;
+}
+
+export type CartDTO = {
+  id: string;
+  customerId: string;
+  totalQuantity: number;
+  items: CartItemDTO[];
+};
+
+export type getCartParams = {
+  cartId: string;
 }
 
 export interface ICartRepository {
-    addProducts: (inputs: addProductsParams) => Promise<void>;
+  getCart: (args: getCartParams) => Promise<CartDTO>;
+  insertNewCart: (args: CartDTO) => Promise<CartDTO>;
+  editCart: (args: CartDTO) => Promise<CartDTO>;
 }

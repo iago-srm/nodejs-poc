@@ -1,22 +1,18 @@
-import { IProductRepository } from "@application";
+import { IProductRepository, ProductDTO } from "@application";
 import { IBaseCollection, IDatabase } from "./base-repository";
 
-type Product = {
-  id: string;
-  name: string;
-  description: string;
-  image: string;
-  category: string;
-  specialOffer: string;
-  discount: number;
-};
 
-export class ProductRepository implements IProductRepository {
-  private readonly collection: IBaseCollection<Product>;
-  constructor(db: IDatabase) {
-    this.collection = db.getCollection("products");
+class ProductRepository implements IProductRepository {
+
+  private readonly collection: IBaseCollection<ProductDTO>;
+  
+  constructor(database: IDatabase) {
+    this.collection = database.getCollection("products");
   }
+  
   getProducts() {
     return this.collection.getAll();
   }
 }
+
+export default ProductRepository;

@@ -1,6 +1,6 @@
 import {
   IDatabase,
-  IBaseCollection,
+  IBaseCollection
 } from "@/src/adapters/repositories/base-repository";
 
 export class InMemoryDatabase implements IDatabase {
@@ -27,20 +27,29 @@ export class InMemoryDatabase implements IDatabase {
 }
 
 class InMemoryCollection<P> implements IBaseCollection<P> {
-  constructor(private data) {}
+  constructor(private repository: P[]) {}
 
-  getOne(id: string) {
-    return new Promise<P>((resolve) =>
-      resolve(this.data.find((el) => el.id === id))
+  // TODO: test if this promise throws when rejected (search object with non-existing id)
+  getOneById(id: string) {
+    return new Promise<P>((resolve, reject) => {
+        const entity = this.repository.find((el) => {
+          return (el as {[k: string]: any}).id === id
+        });
+        if(!entity) {
+          reject(`Object with id ${id} not found`);
+          return;
+        }
+        resolve(entity);
+      }
     );
   }
 
   getAll() {
-    return new Promise<P[]>((resolve) => resolve(this.data));
+    return new Promise<P[]>((resolve) => resolve(this.repository));
   }
 
-  insertOne(data) {
-    this.data.push(data);
+  insertOne(data: P) {
+    this.repository.push(data);
     return new Promise<P>((resolve) => resolve(data));
   }
 }

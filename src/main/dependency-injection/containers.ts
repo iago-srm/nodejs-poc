@@ -11,9 +11,10 @@ import { RedisProxy, logger, createRedisClient } from "src/frameworks";
 // import { CartPostFactory } from "@adapters";
 import path from "path";
 // import { makeUserRouter } from "src/adapters";
-import { Application } from "./http/express/app";
-import { dbConnectionNames } from "../../ormconfig.enum";
+import { Application } from "../http/express/app";
+import { dbConnectionNames } from "../../../ormconfig.enum";
 import fg from "fast-glob";
+import { RestControllerResolver, UseCaseResolver, DependencyResolver } from './resolvers';
 
 export enum Dependencies {
   APP = "app",
@@ -75,19 +76,6 @@ const _getDbConfig = () => {
 // };
 // _getUseCases();
 
-const _getControllers = () => {
-  // const paths = fg.sync('**/src/adapters/http-controllers/**/(post|get|put|delete).ts');
-  // console.log(paths);
-  // paths.forEach(path => {
-  //   const dirs = path.split('/');
-  //   console.log('route:',dirs[dirs.length-2]);
-  //   console.log('method:',dirs[dirs.length-1].split('.')[0]);
-  // });
-  // console.log(process.cwd())
-  const results = listModules(["**/src/**/http-controllers/**/post.ts"]);
-  console.log("results:", results);
-};
-// _getControllers();
 const config = _getDbConfig();
 
 container.register({
@@ -116,38 +104,22 @@ container.register({
   // [Dependencies.USERROUTER]: asFunction(makeUserRouter).classic(),
 });
 
-class RestControllerNameResolver {
-  httpMethods = ["post", "get", "put", "delete"];
-  registeredControllerNames: string[] = [];
-  _getGlobPattern() {
-    return `**/src/adapters/REST-controllers/**/@(${this.httpMethods.join(
-      "|"
-    )}).ts`;
-  }
-  _resolveControllerName(fileName: string, filePath: string) {
-    const dirs = filePath.split(path.sep); //test this on mac and linux
-    // console.log(dirs);
-    const entity = dirs[dirs.length - 2];
-    const method = fileName.split(".")[0];
-    const name = `${entity}-${method}-RESTcontroller`;
-    this.registeredControllerNames.push(name);
-    return name;
-  }
-  _getControllers(container: AwilixContainer) {
-    return this.registeredControllerNames.map((name) => ({
-      entity: name.split("-")[0],
-      method: name.split("-")[1],
-      controller: container.resolve(name),
-    }));
-  }
+
+
+const resolvers = [
+  new RestControllerResolver(),
+  new UseCaseResolver()
+];
+
+const loadModulesWithResolver = (resolver: DependencyResolver) => {
+  container.loadModules([resolver.getGlobPattern()], {
+    formatName: (name, descriptor) => {
+      return resolver.resolveNames(name, descriptor.path);
+    }
+  })
 }
 
-const controllerResolver = new RestControllerNameResolver();
-
-container.loadModules([controllerResolver._getGlobPattern()], {
-  formatName: (name, descriptor) =>
-    controllerResolver._resolveControllerName(name, descriptor.path),
-});
+resolvers.forEach(resolver => loadModulesWithResolver(resolver));
 
 // console.log(controllerResolver._getControllers(container));
 export { container };

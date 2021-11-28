@@ -1,4 +1,4 @@
-import { container as testContainer, Dependencies } from "../main/containers";
+import { container as testContainer, Dependencies } from "../main/dependency-injection/containers";
 import { Application } from "../main/http/express/app";
 import { User } from "@domain";
 import { RedisProxy } from "src/frameworks";

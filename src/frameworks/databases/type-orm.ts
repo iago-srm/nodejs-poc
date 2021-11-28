@@ -1,14 +1,15 @@
 import {
   IDatabase,
-  IBaseCollection,
+  IBaseCollection
 } from "@/src/adapters/repositories/base-repository";
 import { createConnection, Connection, Repository } from "typeorm";
+
 export class TypeORMDatabase implements IDatabase {
   connection: Connection;
 
-  async connect() {
+  async connect(connectionName: string) {
     try {
-      this.connection = await createConnection();
+      this.connection = await createConnection(connectionName);
       return true;
     } catch {
       return false;
@@ -24,27 +25,38 @@ export class TypeORMDatabase implements IDatabase {
     }
   }
 
-  getCollection(collectionName: string): TypeORMCollection {
-    const repository = this.connection.getRepository(collectionName);
-    return repository;
+  getCollection<P>(collectionName: string): TypeORMCollectionAdapter<P> {
+    const repository = this.connection.getRepository<P>(collectionName);
+    return new TypeORMCollectionAdapter<P>(repository);
   }
 }
 
-class TypeORMCollection implements IBaseCollection {
-  constructor(private repository: Repository) {}
+class TypeORMCollectionAdapter<P> implements IBaseCollection<P> {
+  constructor(private repository: Repository<P>) {}
 
-  getOne<P>(id: string) {
-    return new Promise<P>((resolve) =>
-      resolve(this.data.find((el) => el.id === id))
-    );
+  async getOneById(id: string) {
+    if(!id) {
+      throw Error("Null id was passed");
+    }
+    const response = await this.repository.findOneOrFail(id);
+    return response;
   }
 
-  getAll<P>() {
-    return new Promise<P>((resolve) => resolve(this.data));
+  getManyByIds(ids: string[]) {
+    return this.repository.findByIds(ids) // does this fail if one id is not found?
   }
 
-  insertOne<P>(data) {
-    this.data.push(data);
-    return new Promise<P>((resolve) => resolve(data));
+  getAll() {
+    return this.repository.find();
+  }
+
+  async editOne(id: string, entity: P) {
+    const result = await this.repository.update(id, entity);
+    return (result.generatedMaps as P[])[0];
+  }
+
+  async insertOne(data: P) {
+    const result = await this.repository.insert(data);
+    return (result.generatedMaps as P[])[0];
   }
 }

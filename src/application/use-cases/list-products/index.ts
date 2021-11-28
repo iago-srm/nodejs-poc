@@ -11,10 +11,12 @@ export type IListProductsUseCaseFactory = IUseCaseFactory<
   Return
 >;
 
-export const ListProductsUseCaseFactory: IListProductsUseCaseFactory = (
+const ListProductsUseCaseFactory: IListProductsUseCaseFactory = (
   productRepository
 ) => {
   return {
     execute: () => productRepository.getProducts(),
   };
 };
+
+export default ListProductsUseCaseFactory;
