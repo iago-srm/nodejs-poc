@@ -1,5 +1,5 @@
 import { ICartRepository, CartDTO, getCartParams } from "@application";
-import { IBaseCollection, IDatabase } from "./base-repository";
+import { IBaseCollection, IDatabase } from "./ibase-repository";
 
 class CartRepository implements ICartRepository {
 
@@ -16,7 +16,7 @@ class CartRepository implements ICartRepository {
     return this.collection.getOneById(args.cartId);
   }
 
-  editCart(args: CartDTO) {
+  editCart(args) {
     return this.collection.editOne(args.id, args);
   }
 }

@@ -1,5 +1,5 @@
 import { IProductRepository, ProductDTO } from "@application";
-import { IBaseCollection, IDatabase } from "./base-repository";
+import { IBaseCollection, IDatabase } from "./ibase-repository";
 
 
 class ProductRepository implements IProductRepository {

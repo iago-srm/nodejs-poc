@@ -1,5 +1,5 @@
 export type CartItemDTO = {
-  id: string;
+  productId: string;
   quantity: number;
 }
 
@@ -7,6 +7,7 @@ export type CartDTO = {
   id: string;
   customerId: string;
   totalQuantity: number;
+  totalPrice: string;
   items: CartItemDTO[];
 };
 

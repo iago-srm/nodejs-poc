@@ -39,10 +39,15 @@ export type IUserUseCase = ReturnType<typeof UserUseCase>;
  * Add payment method
  * Change payment method
  * Procceed with purchase of cart: add cart to purchase history and connect to some payment service. Can pay with mix of wallet and registered payment method. Communicate with shipping service afterwards
- * retrieve items from the shopping cart and create a new order;
+retrieve items from the shopping cart and create a new order;
 pay for the order;
 notify the user if the payment fails;
 clear the cart and show the order.
+we want to create a new order;
+pay for it in a third-party payment system;
+if the payment failed, notify the user about it;
+if it passed, save the order on the server;
+add the order to the local data store to show on the screen.
  * List products by filters (incl. in special offer)
  * Get product details
  * Sign into mailing list

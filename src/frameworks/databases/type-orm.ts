@@ -1,7 +1,7 @@
 import {
   IDatabase,
   IBaseCollection
-} from "@/src/adapters/repositories/base-repository";
+} from "@/src/adapters/repositories/ibase-repository";
 import { createConnection, Connection, Repository } from "typeorm";
 
 export class TypeORMDatabase implements IDatabase {

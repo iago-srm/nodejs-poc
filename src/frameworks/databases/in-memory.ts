@@ -1,7 +1,7 @@
 import {
   IDatabase,
   IBaseCollection
-} from "@/src/adapters/repositories/base-repository";
+} from "@/src/adapters/repositories/ibase-repository";
 
 export class InMemoryDatabase implements IDatabase {
   db: {
