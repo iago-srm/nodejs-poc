@@ -11,6 +11,6 @@ export type ProductDTO = {
 
 export interface IProductRepository {
   getProducts: () => Promise<ProductDTO[]>;
-  getProductsByIds: (ids: string[]) => Promise<ProductDTO[]>;
+  // getProductsByIds: (ids: string[]) => Promise<ProductDTO[]>;
   getProductById: (id: string) => Promise<ProductDTO>;
 }

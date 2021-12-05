@@ -12,15 +12,16 @@ import { AddressInfo } from "net";
 import { Server as WSServer } from "socket.io";
 import { errorHandler, startPolyglot } from "@iagosrm/common";
 import { Messages } from "@locales";
+import Hapi, { Server as HapiServer } from 'hapi';
 
 interface ApplicationParams {
-  userRouter: Router;
   db: RedisProxy;
   logger;
 }
 
-export class Application {
+export class Server {
   _app: Express;
+  _hapiApp: HapiServer;
   _db: RedisProxy;
   _server: HttpServer | HttpsServer;
   baseUrn = "api/v1";
@@ -29,6 +30,7 @@ export class Application {
 
   constructor({ db, logger }: ApplicationParams) {
     this._app = express();
+    this._hapiApp = new Hapi.Server();
     this._db = db;
     this._logger = logger;
 
@@ -71,17 +73,20 @@ export class Application {
       key: fs.readFileSync("./certificates/key.pem"),
       cert: fs.readFileSync("./certificates/cert.pem"),
     };
-    this._server = https.createServer(localHostSSL, this._app);
+    // this._server = https.createServer(localHostSSL, this._app);
+    this._server = https.createServer(localHostSSL, this._hapiApp.op);
+
     this._setIOServer(this._server);
     const start = () => {
       const { address, port } = this._server.address() as AddressInfo;
       this._logger.info(`Secure app running at ${address}:${port}`);
     };
-    this._server.listen(parseInt(process.env.APP_PORT || "43"), start);
+    this._server.listen(parseInt(process.env.APP_PORT || "443"), start);
   }
 
   async _nonSecureStart() {
-    this._server = http.createServer(this._app);
+    // this._server = http.createServer(this._app);
+    this._server = http.createServer(this._hapiApp.app);
     this._setIOServer(this._server);
     this._server.listen(parseInt(process.env.APP_PORT || "3000"), () => {
       const { address, port } = this._server.address() as AddressInfo;

@@ -6,11 +6,15 @@ import { IController } from '../ports';
 const CartPostFactory = (addToCartUseCase: IAddToCartUseCase) => {
     const fn: IController = async (params, body) => {
         const cartId = params.cartId;
-        const productIds = body.products;
+        const productId = body.productId;
+        const newQuantity = body.newQuantity;
+        const customerId = body.customerId;
     
         await addToCartUseCase.execute({
             cartId,
-            productIds
+            productId,
+            newQuantity,
+            customerId
         })
     
         return {

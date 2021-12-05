@@ -1,27 +1,22 @@
 import { DependencyResolver } from "./dependency-resolver";
 import { AwilixContainer } from "awilix";
+import { Routes } from '@adapters';
 
 export class RestControllerResolver extends DependencyResolver {
-    httpMethods = ["post", "get", "put", "delete"];
+    // httpMethods = ["post", "get", "put", "delete"];
     registeredControllerNames: string[] = [];
     getGlobPattern() {
-      return `**/src/adapters/REST-controllers/**/@(${this.httpMethods.join(
-        "|"
-      )}).ts`;
+      return `**/src/adapters/REST-controllers/**/*.ts`;
     }
-    resolveNames(fileName: string, filePath: string) {
-      const dirs = this.getDirs(filePath); //test this on mac and linux
-      // console.log(dirs);
-      const entity = dirs[dirs.length - 2];
-      const method = fileName.split(".")[0];
-      const name = `${entity}-${method}-RESTcontroller`;
+    resolveNames(fileName: string) {
+      const name = `${fileName}-RESTcontroller`;
       this.registeredControllerNames.push(name);
       return name;
     }
     _getControllers(container: AwilixContainer) {
       return this.registeredControllerNames.map((name) => ({
-        entity: name.split("-")[0],
-        method: name.split("-")[1],
+        path: Routes[name].path,
+        method: Routes[name].method,
         controller: container.resolve(name),
       }));
     }

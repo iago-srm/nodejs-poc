@@ -5,7 +5,7 @@ export type CartItemDTO = {
 
 export type CartDTO = {
   id: string;
-  customerId: string;
+  // customerId: string;
   totalQuantity: number;
   totalPrice: string;
   items: CartItemDTO[];

@@ -1,5 +1,0 @@
-import { }
-
-const registerExpressRouters = (app) => {
-
-}

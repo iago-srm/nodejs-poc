@@ -11,13 +11,19 @@ import { RedisProxy, logger, createRedisClient } from "src/frameworks";
 // import { CartPostFactory } from "@adapters";
 import path from "path";
 // import { makeUserRouter } from "src/adapters";
-import { Application } from "../http/express/app";
+import { Server } from "../../frameworks/http/express/app";
 import { dbConnectionNames } from "../../../ormconfig.enum";
 import fg from "fast-glob";
-import { RestControllerResolver, UseCaseResolver, DependencyResolver } from './resolvers';
+import { 
+  RestControllerResolver, 
+  UseCaseResolver, 
+  DependencyResolver, 
+  RepositoryResolver 
+} from './resolvers';
+import { registerExpressRoutes } from '../http/express/register-routes';
 
 export enum Dependencies {
-  APP = "app",
+  SERVER = "server",
   USECASES = "userUseCase",
   DB = "db",
   MIDDLEWARE = "middleware",
@@ -82,9 +88,9 @@ container.register({
   [Dependencies.DB]: asClass(RedisProxy)
     .singleton()
     .disposer(async (db) => await db.closeConnection()),
-  [Dependencies.APP]: asClass(Application)
+  [Dependencies.SERVER]: asClass(Server)
     .singleton()
-    .disposer(async (app) => await app._server.close()),
+    .disposer(async (app) => app._server.close()),
   [Dependencies.LOGGER]: asValue(logger),
   [Dependencies.DBCONNECTIONNAME]: asValue(config.connectionName),
   [Dependencies.REDISCLIENT]: asFunction(createRedisClient).inject(() => {
@@ -105,10 +111,11 @@ container.register({
 });
 
 
-
+const restControllersResolver = new RestControllerResolver();
 const resolvers = [
-  new RestControllerResolver(),
-  new UseCaseResolver()
+  restControllersResolver,
+  new UseCaseResolver(),
+  new RepositoryResolver()
 ];
 
 const loadModulesWithResolver = (resolver: DependencyResolver) => {
@@ -121,5 +128,9 @@ const loadModulesWithResolver = (resolver: DependencyResolver) => {
 
 resolvers.forEach(resolver => loadModulesWithResolver(resolver));
 
+const server: Server = container.resolve("server");
+restControllersResolver._getControllers(container).forEach(controller => {
+  registerExpressRoutes(server._app, controller);
+})
 // console.log(controllerResolver._getControllers(container));
 export { container };

@@ -1,5 +1,5 @@
 import { ICartRepository, CartDTO, getCartParams } from "@application";
-import { IBaseCollection, IDatabase } from "./ibase-repository";
+import { IBaseCollection, IDatabase } from "../ibase-repository";
 
 class CartRepository implements ICartRepository {
 

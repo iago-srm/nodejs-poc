@@ -1,2 +1,2 @@
-export * from "./add-to-cart";
+export * from "./edit-cart";
 export * from "./list-products";

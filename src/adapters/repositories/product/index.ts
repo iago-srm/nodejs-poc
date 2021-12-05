@@ -1,5 +1,5 @@
 import { IProductRepository, ProductDTO } from "@application";
-import { IBaseCollection, IDatabase } from "./ibase-repository";
+import { IBaseCollection, IDatabase } from "../ibase-repository";
 
 
 class ProductRepository implements IProductRepository {
@@ -12,6 +12,10 @@ class ProductRepository implements IProductRepository {
   
   getProducts() {
     return this.collection.getAll();
+  }
+
+  getProductById(id: string) {
+    return this.collection.getOneById(id);
   }
 }
 
