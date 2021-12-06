@@ -1,23 +1,40 @@
-import { DependencyResolver } from "./dependency-resolver";
-import { AwilixContainer } from "awilix";
+import { DependencyResolver } from './dependency-resolver';
+import { IHTTPControllerDescriptor, IHTTPController } from '@adapters';
+import { AwilixContainer } from 'awilix';
 import { Routes } from '@adapters';
 
 export class RestControllerResolver extends DependencyResolver {
-    // httpMethods = ["post", "get", "put", "delete"];
-    registeredControllerNames: string[] = [];
     getGlobPattern() {
-      return `**/src/adapters/REST-controllers/**/*.ts`;
+        return `**/src/adapters/REST-controllers/**/*.ts`;
     }
     resolveNames(fileName: string) {
-      const name = `${fileName}-RESTcontroller`;
-      this.registeredControllerNames.push(name);
-      return name;
+        const name = `${fileName}-RESTcontroller`;
+        return name;
     }
-    _getControllers(container: AwilixContainer) {
-      return this.registeredControllerNames.map((name) => ({
-        path: Routes[name].path,
-        method: Routes[name].method,
-        controller: container.resolve(name),
-      }));
+    getControllers(container: AwilixContainer) {
+        // const _interpretControllerPath = (path) => {
+        //     const pathParts = path.split('/');
+        //     for (let i = 0; i < pathParts.length; i++) {
+        //         const pathDescriptor = {
+        //             isOptional: false,
+        //             resource: '',
+        //             isParams: false,
+        //         };
+        //         const param = pathParts[i];
+        //         let resource = param;
+        //         if (param[0] === '[' && param[param.length - 1] === ']') {
+        //             pathDescriptor.isParams = true;
+        //             resource = param.substring(1, param.length);
+        //         }
+        //     }
+        // };
+
+        const controllers: IHTTPControllerDescriptor<IHTTPController>[] = [];
+        for (let registrationName in container.registrations) {
+            if (registrationName.includes('RESTcontroller')) {
+                controllers.push(container.resolve(registrationName));
+            }
+        }
+        return controllers;
     }
-  }
+}

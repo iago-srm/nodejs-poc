@@ -1,55 +1,78 @@
-import {
-  IDatabase,
-  IBaseCollection
-} from "@/src/adapters/repositories/ibase-repository";
+import { IDatabase, IBaseCollection } from '@adapters';
+import { ILogger } from '@common';
 
 export class InMemoryDatabase implements IDatabase {
-  db: {
-    [key: string]: InMemoryCollection<any>;
-  };
-
-  connect() {
-    this.db = {
-      products: new InMemoryCollection([]),
-      cart: new InMemoryCollection([]),
+    _db: {
+        [key: string]: InMemoryCollection<any>;
     };
-    return new Promise<boolean>((resolve) => resolve(true));
-  }
+    _connectionName: string;
+    _logger: ILogger;
 
-  close() {
-    this.db = {};
-    return new Promise<boolean>((resolve) => resolve(true));
-  }
+    constructor({ dbConnectionName, logger }) {
+        this._connectionName = dbConnectionName;
+        this._logger = logger;
+    }
 
-  getCollection(collectionName: string) {
-    return this.db[collectionName];
-  }
+    connect() {
+        this._logger.info(
+            'connection to ' + this._connectionName + ' database successful'
+        );
+        this._db = {
+            products: new InMemoryCollection([]),
+            carts: new InMemoryCollection([]),
+            customers: new InMemoryCollection([]),
+        };
+        return new Promise<boolean>((resolve) => resolve(true));
+    }
+
+    closeConnection() {
+        this._db = {};
+        return new Promise<boolean>((resolve) => resolve(true));
+    }
+
+    getCollection(collectionName: string) {
+        if (!this._db) return new InMemoryCollection([]);
+        return this._db[collectionName];
+    }
 }
 
 class InMemoryCollection<P> implements IBaseCollection<P> {
-  constructor(private repository: P[]) {}
+    constructor(private repository: P[]) {}
 
-  // TODO: test if this promise throws when rejected (search object with non-existing id)
-  getOneById(id: string) {
-    return new Promise<P>((resolve, reject) => {
-        const entity = this.repository.find((el) => {
-          return (el as {[k: string]: any}).id === id
+    // TODO: test if this promise throws when rejected (search object with non-existing id)
+    getOneById(id: string) {
+        return new Promise<P>((resolve, reject) => {
+            const entity = this.repository.find((el) => {
+                return (el as { [k: string]: any }).id === id;
+            });
+            if (!entity) {
+                reject(`Object with id ${id} not found`);
+                return;
+            }
+            resolve(entity);
         });
-        if(!entity) {
-          reject(`Object with id ${id} not found`);
-          return;
-        }
-        resolve(entity);
-      }
-    );
-  }
+    }
 
-  getAll() {
-    return new Promise<P[]>((resolve) => resolve(this.repository));
-  }
+    getAll() {
+        return new Promise<P[]>((resolve) => resolve(this.repository));
+    }
 
-  insertOne(data: P) {
-    this.repository.push(data);
-    return new Promise<P>((resolve) => resolve(data));
-  }
+    insertOne(data: P) {
+        this.repository.push(data);
+        return new Promise<P>((resolve) => resolve(data));
+    }
+
+    editOne(id: string, entity: P) {
+        return new Promise<P>((resolve, reject) => {
+            const entityIndex = this.repository.findIndex((el) => {
+                return (el as { [k: string]: any }).id === id;
+            });
+            if (entityIndex === -1) {
+                reject(`Object with id ${id} not found`);
+                return;
+            }
+            this.repository[entityIndex] = entity;
+            resolve(entity);
+        });
+    }
 }

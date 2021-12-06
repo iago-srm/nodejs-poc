@@ -1,4 +1,5 @@
 export * from "./cached-database";
-export { IDatabase } from "./database";
 export * from "./redis-client";
-export * from "./logger";
+
+export * from "./databases";
+export * from "./http";

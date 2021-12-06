@@ -1,17 +1,25 @@
-import { IListProductsUseCase } from "@application";
-import { IController } from "../ports";
+// import { IListProductsUseCase } from '@application';
+// import { IHTTPController, IHTTPControllerDescriptor } from '../ports';
 
-const ProductGetFactory = (listProductsUseCase: IListProductsUseCase) => {
-  const fn: IController = async () => {
-    const products = await listProductsUseCase.execute();
+// const ProductGetFactory = ({
+//     listProductsUseCase,
+// }: {
+//     listProductsUseCase: IListProductsUseCase;
+// }): IHTTPControllerDescriptor<IHTTPController> => {
+//     const fn: IHTTPController = async () => {
+//         const products = await listProductsUseCase.execute();
 
-    return {
-      response: products,
-      statusCode: 201,
-    };
-  };
+//         return {
+//             response: products,
+//             statusCode: 201,
+//         };
+//     };
 
-  return fn;
-};
+//     return {
+//         controller: fn,
+//         method: 'get',
+//         path: [{ resource: 'products', isParams: false }],
+//     };
+// };
 
-export default ProductGetFactory;
+// export default ProductGetFactory;

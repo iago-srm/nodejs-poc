@@ -1,4 +1,3 @@
-
 export interface IBaseCollection<P> {
   getOneById: (id: string) => Promise<P>;
   getAll: () => Promise<P[]>;
@@ -7,8 +6,7 @@ export interface IBaseCollection<P> {
 }
 
 export interface IDatabase {
-  connect: (connectionInfo: any) => Promise<boolean>;
-  close: () => Promise<boolean>;
-  getCollection: <P>(collectionName: string) => 
-    IBaseCollection<P>;
+  connect: () => Promise<boolean>;
+  closeConnection: () => Promise<boolean>;
+  getCollection: <P>(collectionName: string) => IBaseCollection<P>;
 }
