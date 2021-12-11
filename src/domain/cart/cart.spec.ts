@@ -1,4 +1,4 @@
-import { InvalidParametersError } from '@common/errors';
+import { InconsistentCartQuantitiesError } from '@common/errors';
 import { USD } from '@domain';
 import { Cart, CartItem } from '.';
 import { Product } from '../product';
@@ -28,7 +28,7 @@ describe('Cart entity', () => {
         expect(sut.getItems()).toStrictEqual(cartItems);
     });
 
-    test('Instantiating with inconsistent values throws InvalidParametersError.', () => {
+    test('Instantiating with inconsistent values throws InconsistentCartQuantitiesError.', () => {
         const cartItems = [
             new CartItem({
                 product: new Product({ id: '7' }),
@@ -41,7 +41,7 @@ describe('Cart entity', () => {
                 totalQuantity: 7,
                 items: cartItems,
             });
-        expect(makeSut).toThrow(InvalidParametersError);
+        expect(makeSut).toThrow(InconsistentCartQuantitiesError);
     });
 
     describe('SUT.insertItems', () => {

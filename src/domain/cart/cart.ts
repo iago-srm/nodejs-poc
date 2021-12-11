@@ -1,5 +1,5 @@
 import { Customer, CartItem, USD } from '@domain';
-import { InvalidParametersError } from '@common/errors';
+import { InconsistentCartQuantitiesError } from '@common/errors';
 
 interface CartConstructorParams {
     id: string;
@@ -28,18 +28,13 @@ export class Cart {
         }
     }
 
-    // insertManyItems(items: CartItem[]) {
-    //     items.forEach(item => this.insertProducts(item));
-    // }
     validateQuantities(items: CartItem[], quantity: number) {
         let totalQuantity = 0;
         items.forEach((item) => {
             totalQuantity += item.getQuantity();
         });
         if (totalQuantity !== quantity) {
-            throw new InvalidParametersError(
-                'Item quantities and total quantity do not match.'
-            );
+            throw new InconsistentCartQuantitiesError();
         }
     }
     insertProducts(item: CartItem) {
