@@ -1,4 +1,5 @@
-import { Product } from '@domain';
+import { InvalidParametersError } from '@common/errors';
+import { Product } from '../product';
 
 interface CartItemConstructorParams {
     product: Product;
@@ -16,8 +17,8 @@ export class CartItem {
     }
 
     validateQuantity() {
-        if(this.quantity < 0) {
-            throw new Error();
+        if (this.quantity < 0) {
+            throw new InvalidParametersError('Invalid quantity');
         }
     }
 

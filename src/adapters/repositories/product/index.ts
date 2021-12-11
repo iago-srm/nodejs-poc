@@ -1,20 +1,20 @@
-import { IProductRepository, ProductDTO } from '@application'
-import { IBaseCollection, IDatabase } from '../ibase-repository'
+import { IProductRepository, ProductDTO } from '@application/ports';
+import { IBaseCollection, IDatabase } from '../ibase-repository';
 
 class ProductRepository implements IProductRepository {
-    private readonly collection: IBaseCollection<ProductDTO>
+    private readonly collection: IBaseCollection<ProductDTO>;
 
     constructor({ db }: { db: IDatabase }) {
-        this.collection = db.getCollection('products')
+        this.collection = db.getCollection('products');
     }
 
     getProducts() {
-        return this.collection.getAll()
+        return this.collection.getAll();
     }
 
     getProductById(id: string) {
-        return this.collection.getOneById(id)
+        return this.collection.getOneById(id);
     }
 }
 
-export default ProductRepository
+export default ProductRepository;

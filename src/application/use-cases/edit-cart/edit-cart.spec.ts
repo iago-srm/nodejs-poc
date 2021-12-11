@@ -1,108 +1,210 @@
 import EditCartUseCaseFactory from './index';
-import { 
-    IUseCaseFactory, 
-    IUseCase, 
-    ICartRepository, 
-    IProductRepository, 
+import {
+    IUseCaseFactory,
+    IUseCase,
+    ICartRepository,
+    IProductRepository,
     ICustomerRepository,
     ProductDTO,
     CartDTO,
-    CustomerDTO
+    CustomerDTO,
 } from '../../ports';
 import { Cart, Product, CartItem, USD, Customer } from '@domain';
+import {
+    DatabaseError,
+    ProductNotFoundError,
+    ObjectNotFoundError,
+    CartNotFoundError,
+    CartDoesNotBelongToCustomerError,
+} from '@common/errors';
+import { InputParams } from '..';
 
 const makeSUT = (args: {
-    cartRepository?: ICartRepository,
-    productRepository?: IProductRepository,
-    customerRepository?: ICustomerRepository
+    cartRepository?: ICartRepository;
+    productRepository?: IProductRepository;
+    customerRepository?: ICustomerRepository;
 }) => {
     return EditCartUseCaseFactory({
         cartRepository: args.cartRepository || {
-            getCart: jest.fn(),
+            getCartById: jest.fn(),
             insertNewCart: jest.fn(),
-            editCart: jest.fn()
+            editCart: jest.fn(),
         },
         productRepository: args.productRepository || {
             getProducts: jest.fn(),
             getProductById: jest.fn(),
-            getProductsByIds: jest.fn()
         },
         customerRepository: args.customerRepository || {
-            getCustomer: jest.fn(),
-        }
+            getCustomerById: jest.fn(),
+        },
     });
-}
-describe("Edit cart use case", () => {
+};
 
+const testDataBuilder = {
+    getCustomerDTO: ({ id = '1', cartId = '1' }): CustomerDTO => {
+        return {
+            id,
+            cartId,
+        };
+    },
 
-    it("Should call cartRepository.getCart exactly once", () => {
+    getCartDTO: ({
+        id = '1',
+        totalPrice = '1USD',
+        totalQuantity = 1,
+        items = [],
+    }): CartDTO => {
+        return {
+            id,
+            totalPrice,
+            totalQuantity,
+            items,
+        };
+    },
+
+    getSUTInput: ({
+        productId = '1',
+        newQuantity = 1,
+        cartId = '1',
+        customerId = '1',
+    }): InputParams => {
+        return {
+            productId,
+            newQuantity,
+            cartId,
+            customerId,
+        };
+    },
+};
+describe('Edit cart use case', () => {
+    it('Should call cartRepository.getCart exactly once', () => {
         const cartRepository = {
-            getCart: jest.fn(),
+            getCartById: jest.fn(),
             insertNewCart: jest.fn(),
-            editCart: jest.fn()
-        }
+            editCart: jest.fn(),
+        };
         const sut = makeSUT({ cartRepository });
         sut.execute({
             productId: '1',
             newQuantity: 1,
             customerId: '1',
-            cartId: '1'
+            cartId: '1',
         });
-        expect(cartRepository.getCart).toHaveBeenCalledTimes(1);
+        expect(cartRepository.getCartById).toHaveBeenCalledTimes(1);
     });
 
-    it("Should call customerRepository.getCustomer exactly once", () => {
+    it('Should call customerRepository.getCustomer exactly once', () => {
         const customerRepository = {
-            getCustomer: jest.fn(),
-        }
+            getCustomerById: jest.fn(),
+        };
         const sut = makeSUT({ customerRepository });
         sut.execute({
             productId: '1',
             newQuantity: 1,
             customerId: '1',
-            cartId: '1'
+            cartId: '1',
         });
-        expect(customerRepository.getCustomer).toHaveBeenCalledTimes(1);
+        expect(customerRepository.getCustomerById).toHaveBeenCalledTimes(1);
     });
 
-    it("Should call productRepository.getProductById exactly once", () => {
+    it('Should call productRepository.getProductById exactly once', () => {
         const productRepository = {
             getProducts: jest.fn(),
             getProductById: jest.fn(),
-            getProductsByIds: jest.fn()
-        }
+            getProductsByIds: jest.fn(),
+        };
         const sut = makeSUT({ productRepository });
         sut.execute({
             productId: '1',
             newQuantity: 1,
             customerId: '1',
-            cartId: '1'
+            cartId: '1',
         });
         expect(productRepository.getProductById).toHaveBeenCalledTimes(1);
     });
 
-    it("Should rethrow error if getProductById throws an error", () => {
+    it('Should throw ProductNotFoundError if getProductById throws ObjectNotFoundError', () => {
         const productRepository = {
-            getProductById: jest.fn(() => {throw new Error()}),
+            getProductById: jest.fn(() => {
+                throw new ObjectNotFoundError();
+            }),
             getProducts: jest.fn(),
-            getProductsByIds: jest.fn()
+            getProductsByIds: jest.fn(),
         };
         const sut = makeSUT({ productRepository });
-        expect(sut.execute).toThrow();
+        expect(sut.execute).toThrow(ProductNotFoundError);
     });
 
-    it("Should throw an error if cart does not belong to customer", async () => {
-        const customerRepository = {
-            getCustomer: jest.fn<Promise<CustomerDTO>,[string]>(() => new Promise(res => res({id: '1', cartId: '1'})))
-        }
+    it('Should rethrow error if getProductById throws any other error', () => {
+        const error = new Error('this is a different error');
+        const productRepository = {
+            getProductById: jest.fn(() => {
+                throw error;
+            }),
+            getProducts: jest.fn(),
+            getProductsByIds: jest.fn(),
+        };
+        const sut = makeSUT({ productRepository });
+        expect(sut.execute).toThrow(error);
+    });
+
+    it('Should throw CartNotFoundError if getCartById throws ObjectNotFoundError', () => {
         const cartRepository = {
-            getCart: jest.fn<Promise<{id: string}>,[string]>(() => new Promise(res => res({id: '2'}))),
+            getCartById: jest.fn(() => {
+                throw new ObjectNotFoundError();
+            }),
             insertNewCart: jest.fn(),
-            editCart: jest.fn()
-        }
-        const customerDTO = await customerRepository.getCustomer('1')
+            editCart: jest.fn(),
+        };
+        const sut = makeSUT({ cartRepository });
+        expect(sut.execute).toThrow(CartNotFoundError);
     });
-    it("Should return a cart", () => {
 
+    it('Should rethrow error if getCartById throws any other error', () => {
+        const error = new Error('this is a different error');
+        const cartRepository = {
+            getCartById: jest.fn(() => {
+                throw error;
+            }),
+            insertNewCart: jest.fn(),
+            editCart: jest.fn(),
+        };
+        const sut = makeSUT({ cartRepository });
+        expect(sut.execute).toThrow(error);
     });
+
+    it('Should throw a CartDoesNotBelongToCustomerError if cart does not belong to customer', async () => {
+        const customerRepository = {
+            getCustomerById: jest.fn<Promise<CustomerDTO>, [string]>(
+                () =>
+                    new Promise((res) =>
+                        res(
+                            testDataBuilder.getCustomerDTO({
+                                id: '1',
+                                cartId: '2',
+                            })
+                        )
+                    )
+            ),
+        };
+        const cartRepository = {
+            getCartById: jest.fn<Promise<CartDTO>, [string]>(
+                () =>
+                    new Promise((res) =>
+                        res(testDataBuilder.getCartDTO({ id: '1' }))
+                    )
+            ),
+            insertNewCart: jest.fn(),
+            editCart: jest.fn(),
+        };
+
+        const sut = makeSUT({
+            customerRepository,
+            cartRepository,
+        });
+
+        expect(sut.execute).toThrow(CartDoesNotBelongToCustomerError);
+    });
+
+    it('Should return a cart.', () => {});
 });

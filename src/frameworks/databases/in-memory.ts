@@ -1,5 +1,5 @@
-import { IDatabase, IBaseCollection } from '@adapters';
-import { ILogger } from '@common';
+import { IDatabase, IBaseCollection } from '@adapters/repositories';
+import { ILogger } from '@common/logger';
 
 export class InMemoryDatabase implements IDatabase {
     _db: {

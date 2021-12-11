@@ -1,6 +1,6 @@
-import { createContainer, asClass, asValue } from 'awilix';
-import { InMemoryDatabase, ExpressServer } from 'src/frameworks';
-import { logger } from '@common';
+import * as awilix from 'awilix';
+import { InMemoryDatabase } from '@frameworks/databases';
+import { logger } from '@common/logger';
 import { dbConnectionNames } from '../../../ormconfig.enum';
 import {
     RestControllerResolver,
@@ -9,9 +9,9 @@ import {
     RepositoryResolver,
 } from './resolvers';
 import {
-    adaptControllerFunction as expressAdaptControllerFunction,
-    adaptPath as expressAdaptPath,
-} from 'src/frameworks/http/express';
+    ExpressServer as FrameworkServer,
+    ExpressControllerAdapter as FrameworkControllerAdapter,
+} from '@frameworks/http';
 
 export enum Dependencies {
     SERVER = 'server',
@@ -20,7 +20,7 @@ export enum Dependencies {
     DBCONNECTIONNAME = 'dbConnectionName',
 }
 
-const container = createContainer();
+const container = awilix.createContainer();
 
 const _getDbConfig = () => {
     switch (process.env.NODE_ENV) {
@@ -51,17 +51,15 @@ const _getDbConfig = () => {
     }
 };
 
-const config = _getDbConfig();
+const dbConfig = _getDbConfig();
 
 container.register({
-    [Dependencies.DB]: asClass(InMemoryDatabase)
+    [Dependencies.DB]: awilix
+        .asClass(InMemoryDatabase)
         .singleton()
         .disposer(async (db) => await db.closeConnection()),
-    [Dependencies.SERVER]: asClass(ExpressServer)
-        .singleton()
-        .disposer(async (app) => app._server.close()),
-    [Dependencies.LOGGER]: asValue(logger),
-    [Dependencies.DBCONNECTIONNAME]: asValue(config.connectionName),
+    [Dependencies.LOGGER]: awilix.asValue(logger),
+    [Dependencies.DBCONNECTIONNAME]: awilix.asValue(dbConfig.connectionName),
 });
 const restControllersResolver = new RestControllerResolver();
 const resolvers = [
@@ -79,18 +77,30 @@ const loadModulesWithResolver = (resolver: DependencyResolver) => {
 };
 
 resolvers.forEach((resolver) => loadModulesWithResolver(resolver));
+const httpFrameworkadapter = new FrameworkControllerAdapter();
 
-const expressServer: ExpressServer = container.resolve(Dependencies.SERVER);
-restControllersResolver
-    .getControllers(container)
-    .forEach((controllerDescriptor) => {
-        expressServer.registerRoute({
-            method: controllerDescriptor.method,
-            path: expressAdaptPath(controllerDescriptor.path),
-            controller: expressAdaptControllerFunction(
-                controllerDescriptor.controller
-            ),
-        });
-    });
+container.register({
+    [Dependencies.SERVER]: awilix
+        .asClass(FrameworkServer)
+        .singleton()
+        .inject((c) => {
+            return {
+                expressControllers: restControllersResolver
+                    .getControllers(c)
+                    .map((controllerDescriptor) => {
+                        return {
+                            method: controllerDescriptor.method,
+                            path: httpFrameworkadapter.adaptPath(
+                                controllerDescriptor.path
+                            ),
+                            controller:
+                                httpFrameworkadapter.adaptControllerFunction(
+                                    controllerDescriptor.controller
+                                ),
+                        };
+                    }),
+            };
+        }),
+});
 
 export { container };

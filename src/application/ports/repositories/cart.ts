@@ -1,22 +1,18 @@
 export type CartItemDTO = {
-  productId: string;
-  quantity: number;
-}
-
-export type CartDTO = {
-  id: string;
-  // customerId: string;
-  totalQuantity: number;
-  totalPrice: string;
-  items: CartItemDTO[];
+    productId: string;
+    quantity: number;
 };
 
-export type getCartParams = {
-  cartId: string;
-}
+export type CartDTO = {
+    id: string;
+    // customerId: string;
+    totalQuantity: number;
+    totalPrice: string;
+    items: CartItemDTO[];
+};
 
 export interface ICartRepository {
-  getCart: (args: getCartParams) => Promise<CartDTO>;
-  insertNewCart: (args: CartDTO) => Promise<CartDTO>;
-  editCart: (args: CartDTO) => Promise<CartDTO>;
+    getCartById: (id: string) => Promise<CartDTO>;
+    insertNewCart: (args: CartDTO) => Promise<CartDTO>;
+    editCart: (args: CartDTO) => Promise<CartDTO>;
 }

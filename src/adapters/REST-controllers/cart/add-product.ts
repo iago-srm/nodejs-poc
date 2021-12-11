@@ -1,4 +1,4 @@
-import { IAddToCartUseCase } from '@application';
+import { IAddToCartUseCase } from '@application/use-cases';
 import { IHTTPController, IHTTPControllerDescriptor } from '../ports';
 
 const addProductControllerFactory = ({
