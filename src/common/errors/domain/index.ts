@@ -21,3 +21,17 @@ export class InconsistentCartQuantitiesError extends CustomError {
         super(DomainErrorMessages.INCONSISTENT_CART_QUANTITIES);
     }
 }
+
+export class InvalidDiscountError extends CustomError {
+    HTTPstatusCode = 400;
+    constructor() {
+        super(DomainErrorMessages.INCONSISTENT_CART_QUANTITIES);
+    }
+}
+
+export class CartDoesNotBelongToCustomerError extends CustomError {
+    HTTPstatusCode = 400;
+    constructor() {
+        super(DomainErrorMessages.CART_DOES_NOT_BELONG_TO_CUSTOMER);
+    }
+}

@@ -1,5 +1,5 @@
 import { USD } from '../currency';
-import { InvalidParametersError } from '@common/errors';
+import { InvalidDiscountError } from '@common/errors';
 
 export interface ProductConstructorParams {
     id: string;
@@ -36,10 +36,7 @@ export class Product {
     }
 
     validateDiscount(discount: number) {
-        if (discount > 100)
-            throw new InvalidParametersError(
-                'Discount value cannot be greater than 100.'
-            );
+        if (discount > 100) throw new InvalidDiscountError();
     }
 
     getPrice() {

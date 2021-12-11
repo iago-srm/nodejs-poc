@@ -14,10 +14,3 @@ export class CartNotFoundError extends CustomError {
         super(UseCaseErrorMessages.CART_NOT_FOUND);
     }
 }
-
-export class CartDoesNotBelongToCustomerError extends CustomError {
-    HTTPstatusCode = 400;
-    constructor() {
-        super(UseCaseErrorMessages.CART_DOES_NOT_BELONG);
-    }
-}

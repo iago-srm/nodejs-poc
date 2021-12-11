@@ -1,4 +1,5 @@
-import { Cart } from "../cart";
+import { Cart } from '../cart';
+import { CartDoesNotBelongToCustomerError } from '@common/errors';
 
 interface CustomerConstructorParams {
     id: string;
@@ -10,11 +11,17 @@ export class Customer {
     private cart: Cart;
 
     constructor(args: Partial<CustomerConstructorParams>) {
-        this.id = args.id || "";
+        this.id = args.id || '';
         this.cart = args.cart || new Cart({});
     }
 
     isOwnCart(cart: Cart) {
-        return cart.id === this.cart.id;
+        if (cart.id !== this.cart.id)
+            throw new CartDoesNotBelongToCustomerError();
+        return true;
+    }
+
+    getCart() {
+        return this.cart;
     }
 }
