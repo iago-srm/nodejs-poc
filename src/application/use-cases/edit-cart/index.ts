@@ -68,14 +68,10 @@ const EditCartUseCaseFactory: IAddToCartUseCaseFactory = ({
             }
 
             const cart = serializeCart.dtoToEntity(cartDTO);
-            const customer = new Customer({
+            new Customer({
                 id: customerDTO.id,
                 cart: new Cart({ id: customerDTO.cartId }),
             });
-
-            if (!customer.isOwnCart(cart)) {
-                throw new CartDoesNotBelongToCustomerError();
-            }
             const product = new Product({ ...productDTO });
             const newCartItem: CartItem = new CartItem({
                 product,

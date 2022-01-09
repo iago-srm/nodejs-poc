@@ -34,6 +34,9 @@
         "adapters/REST-controllers/index.ts"
         ],
         "@application/use-cases": ["application/use-cases/index.ts"],
+        "@application/ports": [
+            "application/ports/index.ts"
+        ],
         "@domain": [
             "domain/index.ts"
         ],

@@ -77,7 +77,7 @@ const testDataBuilder = {
     },
 };
 describe('Edit cart use case', () => {
-    it('Should call cartRepository.getCart exactly once', () => {
+    it('Should call cartRepository.getCartById exactly once', () => {
         const cartRepository = {
             getCartById: jest.fn(),
             insertNewCart: jest.fn(),
@@ -93,7 +93,7 @@ describe('Edit cart use case', () => {
         expect(cartRepository.getCartById).toHaveBeenCalledTimes(1);
     });
 
-    it('Should call customerRepository.getCustomer exactly once', () => {
+    it('Should call customerRepository.getCustomerById exactly once', () => {
         const customerRepository = {
             getCustomerById: jest.fn(),
         };
@@ -206,5 +206,7 @@ describe('Edit cart use case', () => {
         expect(sut.execute).toThrow(CartDoesNotBelongToCustomerError);
     });
 
-    it('Should return a cart.', () => {});
+    it('Should return a cart with the inserted products.', () => {
+        const sut = makeSUT({});
+    });
 });

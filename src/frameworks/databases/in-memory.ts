@@ -62,7 +62,7 @@ class InMemoryCollection<P> implements IBaseCollection<P> {
         return new Promise<P>((resolve) => resolve(data));
     }
 
-    editOne(id: string, entity: P) {
+    updateOne(id: string, entity: P) {
         return new Promise<P>((resolve, reject) => {
             const entityIndex = this.repository.findIndex((el) => {
                 return (el as { [k: string]: any }).id === id;

@@ -13,12 +13,12 @@ export class Customer {
     constructor(args: Partial<CustomerConstructorParams>) {
         this.id = args.id || '';
         this.cart = args.cart || new Cart({});
+        args.cart && this.isOwnCart(args.cart?.id);
     }
 
-    isOwnCart(cart: Cart) {
-        if (cart.id !== this.cart.id)
+    isOwnCart(cartId: string) {
+        if (cartId !== this.cart.id)
             throw new CartDoesNotBelongToCustomerError();
-        return true;
     }
 
     getCart() {
