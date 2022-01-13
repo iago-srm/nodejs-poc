@@ -6,7 +6,7 @@ export interface IBaseCollection<P> {
 }
 
 export interface IDatabase {
-    connect: () => Promise<boolean>;
+    connect: (connectionName?: string) => Promise<boolean>;
     closeConnection: () => Promise<boolean>;
     getCollection: <P>(collectionName: string) => IBaseCollection<P>;
 }

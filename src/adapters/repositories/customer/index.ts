@@ -8,7 +8,7 @@ class CustomerRepository implements ICustomerRepository {
         this.collection = db.getCollection('customers');
     }
 
-    getCustomer({ customerId }) {
+    getCustomerById(customerId: string) {
         return this.collection.getOneById(customerId);
     }
 }

@@ -7,7 +7,7 @@ export const serializeCart = {
         return new Cart({
             id: dto.id,
             // customer: new Customer({id: dto.customerId}),
-            totalPrice: new USD(dto.totalPrice),
+            totalPrice: new USD(Number(dto.totalPrice)),
             totalQuantity: dto.totalQuantity,
             items: CartItemsFactory(dto.items),
         });

@@ -26,7 +26,7 @@ describe('Customer entity', () => {
             cart: new Cart({ id: '1' }),
         });
 
-        expect(() => customer.isOwnCart(new Cart({ id: '2' }))).toThrow(
+        expect(() => customer.isOwnCart('2')).toThrow(
             CartDoesNotBelongToCustomerError
         );
     });

@@ -1,22 +1,22 @@
 import {
   IDatabase,
   IBaseCollection
-} from "@/src/adapters/repositories/ibase-repository";
+} from "@adapters/repositories";
 import { createConnection, Connection, Repository } from "typeorm";
 
 export class TypeORMDatabase implements IDatabase {
   connection: Connection;
 
-  async connect(connectionName: string) {
+  async connect(connectionName?: string) {
     try {
-      this.connection = await createConnection(connectionName);
+      this.connection = await createConnection(connectionName || 'default');
       return true;
     } catch {
       return false;
     }
   }
 
-  async close() {
+  async closeConnection() {
     try {
       await this.connection.close();
       return true;
@@ -57,6 +57,11 @@ class TypeORMCollectionAdapter<P> implements IBaseCollection<P> {
 
   async insertOne(data: P) {
     const result = await this.repository.insert(data);
+    return (result.generatedMaps as P[])[0];
+  }
+
+  async updateOne(id: string, data: P) {
+    const result = await this.repository.update(id, data)
     return (result.generatedMaps as P[])[0];
   }
 }

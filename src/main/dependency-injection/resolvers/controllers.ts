@@ -1,7 +1,6 @@
 import { DependencyResolver } from './dependency-resolver';
-import { IHTTPControllerDescriptor, IHTTPController } from '@adapters';
 import { AwilixContainer } from 'awilix';
-import { Routes } from '@adapters';
+import { Routes, IHTTPControllerDescriptor, IHTTPController } from '@adapters/REST-controllers';
 
 export class RestControllerResolver extends DependencyResolver {
     getGlobPattern() {
