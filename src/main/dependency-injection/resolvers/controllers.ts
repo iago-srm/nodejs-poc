@@ -1,11 +1,13 @@
 import { DependencyResolver } from './dependency-resolver';
 import { AwilixContainer } from 'awilix';
-import { Routes, IHTTPControllerDescriptor, IHTTPController } from '@adapters/REST-controllers';
+import { IHTTPControllerDescriptor, IHTTPController } from '@adapters/REST-controllers';
 
 export class RestControllerResolver extends DependencyResolver {
+    // file path of where controllers are
     getGlobPattern() {
         return `**/src/adapters/REST-controllers/**/*.ts`;
     }
+    // Returns a string to name the controller registration
     resolveNames(fileName: string) {
         const name = `${fileName}-RESTcontroller`;
         return name;

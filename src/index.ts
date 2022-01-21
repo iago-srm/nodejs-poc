@@ -7,8 +7,19 @@ import {
   Dependencies,
 } from "./main/dependency-injection/containers";
 import { ExpressServer } from "./frameworks/http/express/app";
+import {
+  IDatabase,
+  IBaseCollection
+} from "@adapters/repositories";
 
 (async () => {
-  const server: ExpressServer = container.resolve(Dependencies.SERVER);
-  await server.start();
+  let server: ExpressServer;
+  try {
+    const db:IDatabase = await container.resolve(Dependencies.DB);
+    await db.connect();
+    server = container.resolve(Dependencies.SERVER);
+    await server.start();
+  } catch(e) {
+    console.error("Server instanciating failed",e);
+  }
 })();

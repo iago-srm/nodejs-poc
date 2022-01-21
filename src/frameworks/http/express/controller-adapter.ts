@@ -10,7 +10,6 @@ export class ExpressControllerAdapter implements IHTTPFrameworkAdapter {
         return async function (
             req: Request,
             res: Response,
-            next: NextFunction
         ) {
             const { response, statusCode } = await fn(
                 req.params,
@@ -18,7 +17,6 @@ export class ExpressControllerAdapter implements IHTTPFrameworkAdapter {
                 req.query
             );
             res.status(statusCode).json(response);
-            next();
         };
     }
 

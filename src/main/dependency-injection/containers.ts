@@ -1,5 +1,5 @@
 import * as awilix from 'awilix';
-import { InMemoryDatabase } from '@frameworks/databases';
+import { TypeORMDatabase } from '@frameworks/databases';
 import { logger } from '@common/logger';
 import { dbConnectionNames } from '../../../ormconfig.enum';
 import {
@@ -22,44 +22,43 @@ export enum Dependencies {
 
 const container = awilix.createContainer();
 
-const _getDbConfig = () => {
-    switch (process.env.NODE_ENV) {
-        case 'production':
-            return {
-                connectionName: dbConnectionNames.PRODUCTION,
-                redisHost: process.env.REDIS_HOST,
-                redisPort: process.env.REDIS_PORT,
-            };
-        case 'development':
-            return {
-                connectionName: dbConnectionNames.DEVELOPMENT,
-                redisHost: process.env.REDIS_HOST_DEVELOPMENT,
-                redisPort: process.env.REDIS_PORT_DEVELOPMENT,
-            };
-        case 'test':
-            return {
-                connectionName: dbConnectionNames.TEST,
-                redisHost: process.env.REDIS_HOST_TEST,
-                redisPort: process.env.REDIS_PORT_TEST,
-            };
-        default:
-            return {
-                connectionName: dbConnectionNames.DEVELOPMENT,
-                redisHost: process.env.REDIS_HOST_DEVELOPMENT,
-                redisPort: process.env.REDIS_PORT_DEVELOPMENT,
-            };
-    }
-};
+// const _getDbConfig = () => {
+//     switch (process.env.NODE_ENV) {
+//         case 'production':
+//             return {
+//                 connectionName: dbConnectionNames.PRODUCTION,
+//                 redisHost: process.env.REDIS_HOST,
+//                 redisPort: process.env.REDIS_PORT,
+//             };
+//         case 'development':
+//             return {
+//                 connectionName: dbConnectionNames.DEVELOPMENT,
+//                 redisHost: process.env.REDIS_HOST_DEVELOPMENT,
+//                 redisPort: process.env.REDIS_PORT_DEVELOPMENT,
+//             };
+//         case 'test':
+//             return {
+//                 connectionName: dbConnectionNames.TEST,
+//                 redisHost: process.env.REDIS_HOST_TEST,
+//                 redisPort: process.env.REDIS_PORT_TEST,
+//             };
+//         default:
+//             return {
+//                 connectionName: dbConnectionNames.DEVELOPMENT,
+//                 redisHost: process.env.REDIS_HOST_DEVELOPMENT,
+//                 redisPort: process.env.REDIS_PORT_DEVELOPMENT,
+//             };
+//     }
+// };
 
-const dbConfig = _getDbConfig();
-
+// const dbConfig = _getDbConfig();
 container.register({
     [Dependencies.DB]: awilix
-        .asClass(InMemoryDatabase)
+        .asClass(TypeORMDatabase)
         .singleton()
         .disposer(async (db) => await db.closeConnection()),
     [Dependencies.LOGGER]: awilix.asValue(logger),
-    [Dependencies.DBCONNECTIONNAME]: awilix.asValue(dbConfig.connectionName),
+    [Dependencies.DBCONNECTIONNAME]: awilix.asValue(process.env.NODE_ENV === 'production' ? dbConnectionNames.PRODUCTION : dbConnectionNames.DEVELOPMENT),
 });
 const restControllersResolver = new RestControllerResolver();
 const resolvers = [

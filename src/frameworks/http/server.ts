@@ -24,6 +24,8 @@ export abstract class Server {
     _logger: ILogger;
 
     constructor({ db, logger }) {
+        console.log("Super constructor")
+
         this._db = db;
         this._logger = logger;
     }
@@ -47,11 +49,12 @@ export abstract class Server {
     }
 
     async start() {
-        try {
-            await this._db.connect();
-        } catch {
-            this._logger.error('Failed to connect to database');
-        }
+        // try {
+        //     console.log("Starting server")
+        //     await this._db.connect();
+        // } catch {
+        //     this._logger.error('Failed to connect to database');
+        // }
         const alternativePort = this._hasHTTPS ? '443' : '3000';
         this._server.listen(
             parseInt(process.env.APP_PORT || alternativePort),

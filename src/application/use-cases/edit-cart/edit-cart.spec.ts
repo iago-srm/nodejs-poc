@@ -1,126 +1,115 @@
 import EditCartUseCaseFactory from './index';
 import {
-    IUseCaseFactory,
-    IUseCase,
     ICartRepository,
     IProductRepository,
     ICustomerRepository,
-    ProductDTO,
     CartDTO,
     CustomerDTO,
+    ProductDTO
 } from '../../ports';
-import { Cart, Product, CartItem, USD, Customer } from '@domain';
 import {
-    DatabaseError,
     ProductNotFoundError,
     ObjectNotFoundError,
     CartNotFoundError,
     CartDoesNotBelongToCustomerError,
 } from '@common/errors';
 import { InputParams } from '..';
+import { 
+    testDataHelper
+} from '@common/test-helpers';
 
-const makeSUT = (args: {
-    cartRepository?: ICartRepository;
-    productRepository?: IProductRepository;
-    customerRepository?: ICustomerRepository;
-}) => {
-    return EditCartUseCaseFactory({
-        cartRepository: args.cartRepository || {
-            getCartById: jest.fn(),
-            insertNewCart: jest.fn(),
-            editCart: jest.fn(),
-        },
-        productRepository: args.productRepository || {
-            getProducts: jest.fn(),
-            getProductById: jest.fn(),
-        },
-        customerRepository: args.customerRepository || {
-            getCustomerById: jest.fn(),
-        },
-    });
-};
 
-const testDataBuilder = {
-    getCustomerDTO: ({ id = '1', cartId = '1' }): CustomerDTO => {
-        return {
-            id,
-            cartId,
-        };
-    },
 
-    getCartDTO: ({
-        id = '1',
-        totalPrice = '1USD',
-        totalQuantity = 1,
-        items = [],
-    }): CartDTO => {
-        return {
-            id,
-            totalPrice,
-            totalQuantity,
-            items,
-        };
-    },
-
-    getSUTInput: ({
+const testDataBuilder = () => {
+    const cartRepository = {
+        getCartById: jest.fn(() => new Promise<CartDTO>((res,_) => res({id: '1', totalPrice: '1', totalQuantity: 0, items: []}))),
+        insertNewCart: jest.fn(),
+        editCart: jest.fn(),
+    };
+    const productRepository = {
+        getProducts: jest.fn(),
+        getProductById: jest.fn(() => new Promise<ProductDTO>((res,_) => res({
+            id: '1',
+            description: 'descr',
+            imageUrl: 'url',
+            discount: 9,
+            specialOffer: 'special',
+            name: 'name',
+            category: 'category'
+        }))),
+    };
+    const customerRepository = {
+        getCustomerById: jest.fn(() => new Promise<CustomerDTO>((res,_) => res({id: '1', cartId: '1'})))
+    };
+    const makeSUT = (args: {
+        cartRepository?: ICartRepository;
+        productRepository?: IProductRepository;
+        customerRepository?: ICustomerRepository;
+    }) => {
+        return EditCartUseCaseFactory({
+            cartRepository: args.cartRepository || cartRepository,
+            productRepository: args.productRepository || productRepository,
+            customerRepository: args.customerRepository || customerRepository
+        });
+    };
+    const getSUTInput = (
         productId = '1',
         newQuantity = 1,
         cartId = '1',
         customerId = '1',
-    }): InputParams => {
+    ): InputParams => {
         return {
             productId,
             newQuantity,
             cartId,
             customerId,
         };
-    },
+    };
+    const clearMocks = () => {
+        const repositories = [customerRepository, cartRepository, productRepository];
+        for (let repository of repositories) {
+            for(let mockFn in repository) {
+                repository[mockFn].mockClear();
+            }
+        }
+    }
+    return {
+        makeSUT,
+        getSUTInput,
+        customerRepository,
+        cartRepository,
+        productRepository,
+        clearMocks
+    }
 };
 describe('Edit cart use case', () => {
+    const dataBuilder = testDataBuilder();
     it('Should call cartRepository.getCartById exactly once', () => {
-        const cartRepository = {
-            getCartById: jest.fn(),
-            insertNewCart: jest.fn(),
-            editCart: jest.fn(),
-        };
-        const sut = makeSUT({ cartRepository });
-        sut.execute({
-            productId: '1',
-            newQuantity: 1,
-            customerId: '1',
-            cartId: '1',
-        });
-        expect(cartRepository.getCartById).toHaveBeenCalledTimes(1);
+
+        const sut = dataBuilder.makeSUT({});
+        sut.execute(dataBuilder.getSUTInput());
+        const mockFunction = dataBuilder.cartRepository.getCartById;
+        expect(mockFunction).toHaveBeenCalledTimes(1);
+        dataBuilder.clearMocks();
     });
 
     it('Should call customerRepository.getCustomerById exactly once', () => {
-        const customerRepository = {
-            getCustomerById: jest.fn(),
-        };
-        const sut = makeSUT({ customerRepository });
-        sut.execute({
-            productId: '1',
-            newQuantity: 1,
-            customerId: '1',
-            cartId: '1',
-        });
-        expect(customerRepository.getCustomerById).toHaveBeenCalledTimes(1);
+
+        const sut = dataBuilder.makeSUT({});
+        sut.execute(dataBuilder.getSUTInput());
+        const mockFunction = dataBuilder.customerRepository.getCustomerById;
+        expect(mockFunction).toHaveBeenCalledTimes(1);
+        dataBuilder.clearMocks();
+
     });
 
     it('Should call productRepository.getProductById exactly once', () => {
-        const productRepository = {
-            getProducts: jest.fn(),
-            getProductById: jest.fn(),
-            getProductsByIds: jest.fn(),
-        };
-        const sut = makeSUT({ productRepository });
-        sut.execute({
-            productId: '1',
-            newQuantity: 1,
-            customerId: '1',
-            cartId: '1',
-        });
-        expect(productRepository.getProductById).toHaveBeenCalledTimes(1);
+        const sut = dataBuilder.makeSUT({});
+        sut.execute(dataBuilder.getSUTInput());
+        const mockFunction = dataBuilder.productRepository.getProductById;
+        expect(mockFunction).toHaveBeenCalledTimes(1);
+        dataBuilder.clearMocks();
+
     });
 
     it('Should throw ProductNotFoundError if getProductById throws ObjectNotFoundError', () => {
@@ -131,8 +120,8 @@ describe('Edit cart use case', () => {
             getProducts: jest.fn(),
             getProductsByIds: jest.fn(),
         };
-        const sut = makeSUT({ productRepository });
-        expect(sut.execute).toThrow(ProductNotFoundError);
+        const sut = dataBuilder.makeSUT({ productRepository });
+        return expect(sut.execute(dataBuilder.getSUTInput())).rejects.toThrow(ProductNotFoundError);
     });
 
     it('Should rethrow error if getProductById throws any other error', () => {
@@ -144,8 +133,8 @@ describe('Edit cart use case', () => {
             getProducts: jest.fn(),
             getProductsByIds: jest.fn(),
         };
-        const sut = makeSUT({ productRepository });
-        expect(sut.execute).toThrow(error);
+        const sut = dataBuilder.makeSUT({ productRepository });
+        return expect(sut.execute(dataBuilder.getSUTInput())).rejects.toThrow(error);
     });
 
     it('Should throw CartNotFoundError if getCartById throws ObjectNotFoundError', () => {
@@ -156,8 +145,8 @@ describe('Edit cart use case', () => {
             insertNewCart: jest.fn(),
             editCart: jest.fn(),
         };
-        const sut = makeSUT({ cartRepository });
-        expect(sut.execute).toThrow(CartNotFoundError);
+        const sut = dataBuilder.makeSUT({ cartRepository });
+        return expect(sut.execute(dataBuilder.getSUTInput())).rejects.toThrow(CartNotFoundError);
     });
 
     it('Should rethrow error if getCartById throws any other error', () => {
@@ -169,17 +158,17 @@ describe('Edit cart use case', () => {
             insertNewCart: jest.fn(),
             editCart: jest.fn(),
         };
-        const sut = makeSUT({ cartRepository });
-        expect(sut.execute).toThrow(error);
+        const sut = dataBuilder.makeSUT({ cartRepository });
+        return expect(sut.execute(dataBuilder.getSUTInput())).rejects.toThrow(error);
     });
 
-    it('Should throw a CartDoesNotBelongToCustomerError if cart does not belong to customer', async () => {
+    it.skip('Should throw a CartDoesNotBelongToCustomerError if cart does not belong to customer', async () => {
         const customerRepository = {
             getCustomerById: jest.fn<Promise<CustomerDTO>, [string]>(
                 () =>
                     new Promise((res) =>
                         res(
-                            testDataBuilder.getCustomerDTO({
+                            testDataHelper.getCustomerDTO({
                                 id: '1',
                                 cartId: '2',
                             })
@@ -191,22 +180,22 @@ describe('Edit cart use case', () => {
             getCartById: jest.fn<Promise<CartDTO>, [string]>(
                 () =>
                     new Promise((res) =>
-                        res(testDataBuilder.getCartDTO({ id: '1' }))
+                        res(testDataHelper.getCartDTO({ id: '1' }))
                     )
             ),
             insertNewCart: jest.fn(),
             editCart: jest.fn(),
         };
 
-        const sut = makeSUT({
+        const sut = dataBuilder.makeSUT({
             customerRepository,
             cartRepository,
         });
 
-        expect(sut.execute).toThrow(CartDoesNotBelongToCustomerError);
+        return expect(sut.execute(dataBuilder.getSUTInput())).rejects.toThrow(CartDoesNotBelongToCustomerError);
     });
 
-    it('Should return a cart with the inserted products.', () => {
-        const sut = makeSUT({});
+    it.skip('Should return a cart with the inserted products.', () => {
+        const sut = dataBuilder.makeSUT({});
     });
 });

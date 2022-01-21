@@ -36,13 +36,13 @@ Here is a rundown of the concepts and technologies this project makes use of.
 - `npm run docker-dev` to spin up development db, redis and pgadmin.
 - `npm run dev` to start app
 - After each new environment variable created on '.env', run `npm run gen-env` to update .env.d.ts. That also updates .env.example (which is version-controlled).
-- `docker build -t iagosrm/nodejs-poc .` to redo app image after a change.
+- `docker-compose build` to rebuild app image after a change.
+- `npm run typeorm:migration:generate -- -n migrationName` whenever there is a schema change and there is already data in prod. `npm run typeorm:migration:run` to perform all pending migrations.
 
 # TODO
 
 This is a work in progress. Here are my priorities moving forward
 
-- Figure out typeorm db migrations.
 - CI/CD with Github Actions or Travis and run tests in a dedicated environment.
 - Implement a branch with GraphQL.
 

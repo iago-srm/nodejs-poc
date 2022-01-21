@@ -6,12 +6,17 @@ import { createConnection, Connection, Repository } from "typeorm";
 
 export class TypeORMDatabase implements IDatabase {
   connection: Connection;
+  _dbConnectionName: string;
 
-  async connect(connectionName?: string) {
+  constructor({ dbConnectionName }) {
+    this._dbConnectionName = dbConnectionName;
+  }
+  async connect() {
     try {
-      this.connection = await createConnection(connectionName || 'default');
+      this.connection = await createConnection(this._dbConnectionName || 'development');
       return true;
-    } catch {
+    } catch(e) {
+      console.error("failed to create connection",e)
       return false;
     }
   }
@@ -61,6 +66,7 @@ class TypeORMCollectionAdapter<P> implements IBaseCollection<P> {
   }
 
   async updateOne(id: string, data: P) {
+    console.log({data})
     const result = await this.repository.update(id, data)
     return (result.generatedMaps as P[])[0];
   }

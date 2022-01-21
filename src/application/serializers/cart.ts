@@ -14,15 +14,15 @@ export const serializeCart = {
     },
 
     entityToDTO: (cart: Cart) => {
-        const dto: CartDTO = {
+        const dto = {
             id: cart.id,
             // customerId: cart.getCustomer().id,
             totalPrice: cart.getTotalPrice().toString(),
             totalQuantity: cart.getTotalQuantity(),
-            items: cart.getItems().map((item) => ({
-                quantity: item.getQuantity(),
-                productId: item.getProduct().id,
-            })),
+            // items: cart.getItems().map((item) => ({
+            //     quantity: item.getQuantity(),
+            //     productId: item.getProduct().id,
+            // })),
         };
         return dto;
     },

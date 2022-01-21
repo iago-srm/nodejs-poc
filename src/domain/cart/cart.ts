@@ -15,9 +15,9 @@ export class Cart {
     private items: CartItem[];
 
     constructor(args: Partial<CartConstructorParams>) {
-        args.items &&
-            args.totalQuantity &&
-            this.validateQuantities(args.items, args.totalQuantity);
+        // args.items &&
+        //     args.totalQuantity &&
+        //     this.validateQuantities(args.items, args.totalQuantity);
         this.id = args.id || '';
         this.totalPrice = args.totalPrice || new USD(0);
         this.totalQuantity = args.totalQuantity || 0;
@@ -65,7 +65,9 @@ export class Cart {
     getTotalPrice() {
         return this.totalPrice;
     }
-
+    getTotalPriceString() {
+        return this.totalPrice.getValue();
+    }
     getTotalQuantity() {
         return this.totalQuantity;
     }

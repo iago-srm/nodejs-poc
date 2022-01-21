@@ -24,4 +24,5 @@ module.exports = {
     modulePaths: [
         '<rootDir>'
     ],
+    modulePathIgnorePatterns: ['__test__']
 };

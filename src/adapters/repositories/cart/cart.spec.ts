@@ -1,36 +1,10 @@
 import { CartDTO } from '@application/ports';
-import { assert } from 'console';
 import CartRepository from '.';
 import { IBaseCollection, IDatabase } from '../ibase-repository';
+import { testDataHelper } from '@common/test-helpers';
 
 describe('Methods in cart repository', () => {
-    const testDataHelper = {
-        getSpyDatabase: (): IDatabase => {
-            return {
-                connect: jest.fn(),
-                closeConnection: jest.fn(),
-                getCollection: jest.fn(() => ({
-                    getOneById: jest.fn(),
-                    getAll: jest.fn(),
-                    insertOne: jest.fn<Promise<any>, any[]>(
-                        (obj) => new Promise((resolve) => resolve(obj))
-                    ),
-                    updateOne: jest.fn(),
-                })),
-            };
-        },
-        getCartDTO: ({
-            id = '1',
-            totalQuantity = 2,
-            totalPrice = '10',
-            items = [],
-        }): CartDTO => ({
-            id,
-            totalPrice,
-            totalQuantity,
-            items,
-        }),
-    };
+    
     test("CartRepository gets instantiated with 'carts' collection", () => {
         const databaseSpy = testDataHelper.getSpyDatabase();
         new CartRepository({ db: databaseSpy });

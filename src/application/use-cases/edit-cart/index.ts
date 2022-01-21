@@ -6,6 +6,7 @@ import {
     ICustomerRepository,
     ProductDTO,
     CartDTO,
+    CustomerDTO,
 } from '../../ports';
 import { Cart, Product, CartItem, USD, Customer } from '@domain';
 import { serializeCart } from '../../serializers';
@@ -47,6 +48,7 @@ const EditCartUseCaseFactory: IAddToCartUseCaseFactory = ({
         execute: async (inputs) => {
             let cartDTO: CartDTO;
             let productDTO: ProductDTO;
+            let customerDTO: CustomerDTO;
             try {
                 cartDTO = await cartRepository.getCartById(inputs.cartId);
             } catch (e) {
@@ -54,9 +56,16 @@ const EditCartUseCaseFactory: IAddToCartUseCaseFactory = ({
                     throw new CartNotFoundError();
                 throw e;
             }
-            const customerDTO = await customerRepository.getCustomerById(
-                inputs.customerId
-            );
+            try{
+                customerDTO = await customerRepository.getCustomerById(
+                    inputs.customerId
+                );
+            } catch (e) {
+                if (e instanceof ObjectNotFoundError)
+                    throw new CartNotFoundError();
+                throw e;
+            }
+
             try {
                 productDTO = await productRepository.getProductById(
                     inputs.productId
@@ -68,6 +77,7 @@ const EditCartUseCaseFactory: IAddToCartUseCaseFactory = ({
             }
 
             const cart = serializeCart.dtoToEntity(cartDTO);
+
             new Customer({
                 id: customerDTO.id,
                 cart: new Cart({ id: customerDTO.cartId }),

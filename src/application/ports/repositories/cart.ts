@@ -1,18 +1,18 @@
-export type CartItemDTO = {
-    productId: string;
-    quantity: number;
-};
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne, OneToOne } from "typeorm";
+import { CustomerDTO } from "./customer";
+import { CartItemDTO } from '.';
 
-export type CartDTO = {
+@Entity("carts")
+export class CartDTO {
+    @PrimaryGeneratedColumn()
     id: string;
-    // customerId: string;
+    @Column("int")
     totalQuantity: number;
+    @Column()
     totalPrice: string;
-    items: CartItemDTO[];
+    @OneToMany(() => CartItemDTO, item => item.cart)
+    items?: CartItemDTO[];
+    @OneToOne(() => CustomerDTO, customer => customer.cart)
+    customer?: CustomerDTO;
 };
 
-export interface ICartRepository {
-    getCartById: (id: string) => Promise<CartDTO>;
-    insertNewCart: (args: CartDTO) => Promise<CartDTO>;
-    editCart: (args: CartDTO) => Promise<CartDTO>;
-}

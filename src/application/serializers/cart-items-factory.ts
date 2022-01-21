@@ -3,7 +3,7 @@ import { CartItem, Product } from '@domain';
 export const CartItemsFactory = (args: {
     productId: string;
     quantity: number;
-}[]
+}[] = []
 ): CartItem[] => {
     let cartItems: CartItem[] = [];
     for(let item of args) {

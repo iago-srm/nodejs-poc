@@ -1,16 +1,21 @@
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne, OneToOne } from "typeorm";
 
-export type ProductDTO = {
+@Entity("products")
+export class ProductDTO {
+  @PrimaryGeneratedColumn()
   id: string;
+  @Column()
   name: string;
+  @Column()
   description: string;
-  image: string;
+  @Column()
+  imageUrl: string;
+  @Column()
   category: string;
+  @Column()
   specialOffer: string;
+  @Column()
   discount: number;
 };
 
-export interface IProductRepository {
-  getProducts: () => Promise<ProductDTO[]>;
-  // getProductsByIds: (ids: string[]) => Promise<ProductDTO[]>;
-  getProductById: (id: string) => Promise<ProductDTO>;
-}
+

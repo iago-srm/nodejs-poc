@@ -17,6 +17,7 @@ class CartRepository implements ICartRepository {
     }
 
     editCart(args) {
+        console.log({args})
         return this.collection.updateOne(args.id, args);
     }
 }

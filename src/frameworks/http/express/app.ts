@@ -24,6 +24,7 @@ export class ExpressServer extends AbstractServer {
     _io: WSServer;
 
     constructor({ db, logger, expressControllers }: IExpressConstructorParams) {
+        
         super({ db, logger });
         this._app = express();
         this.setupServer(this._app);

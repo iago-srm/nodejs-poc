@@ -34,7 +34,6 @@ const addProductControllerFactory = ({
         path: [
             { resource: 'cart', isParams: false },
             { resource: 'cartId', isParams: true },
-            { resource: 'productId', isParams: true },
         ],
     };
 };
