@@ -1,37 +1,28 @@
+const { pathsToModuleNameMapper } = require('ts-jest/utils')
+const tsconfig = JSON.parse(require('fs').readFileSync(__dirname + '/tsconfig.json', 'utf8'))
+
 module.exports = {
-  preset: 'ts-jest',
-  testEnvironment: 'node',
-  rootDir: "src",
-  globals: {
+    preset: 'ts-jest',
+    testEnvironment: 'node',
+    rootDir: "src",
+    globals: {
     'ts-jest': {
-      isolatedModules: true,
+        isolatedModules: true,
     },
-  },
-  setupFilesAfterEnv: [
-    "<rootDir>/__test__/setup.ts"
-  ],
-  setupFiles: [
+    },
+    // setupFilesAfterEnv: [
+    // "<rootDir>/__test__/setup.ts"
+    // ],
+    setupFiles: [
     "dotenv/config"
-  ],
-  moduleDirectories: [
+    ],
+    moduleDirectories: [
     "node_modules",
     "src"
-  ],
-  moduleNameMapper: {
-    "@presentation": [
-      "<rootDir>/presentation/index.ts"
     ],
-    "@locales": [
-      "<rootDir>/locales/index.ts"
+    moduleNameMapper: pathsToModuleNameMapper(tsconfig.compilerOptions.paths),
+    modulePaths: [
+        '<rootDir>'
     ],
-    "@infrastructure": [
-      "<rootDir>/infrastructure/index.ts"
-    ],
-    "@application": [
-      "<rootDir>/application/index.ts"
-    ],
-    "@domain": [
-      "<rootDir>/domain/index.ts"
-    ]
-  }
+    modulePathIgnorePatterns: ['__test__']
 };
