@@ -1,37 +1,23 @@
-import { CartDTO, CustomerDTO } from "@application/ports";
-import { IBaseCollection, IDatabase } from '../../adapters/repositories/ibase-repository';
+import { UserDTO } from "@application/ports";
 
-export const testDataHelper = {
-    getSpyDatabase: (): IDatabase => {
-        return {
-            connect: jest.fn(),
-            closeConnection: jest.fn(),
-            getCollection: jest.fn(() => ({
-                getOneById: jest.fn(),
-                getAll: jest.fn(),
-                insertOne: jest.fn<Promise<any>, any[]>(
-                    (obj) => new Promise((resolve) => resolve(obj))
-                ),
-                updateOne: jest.fn(),
-            })),
-        };
-    },
-    getCartDTO: ({
-        id = '1',
-        totalQuantity = 0,
-        totalPrice = '10',
-        items = [],
-    }): CartDTO => ({
-        id,
-        totalPrice,
-        totalQuantity,
-        items
-    }),
+export class TestUserDTOHelper {
+    user: UserDTO = {
+        id: '1',
+        email: 'valid@email.com',
+        hashedPassword: 'hashed-password',
+        name: 'valid',
+        cpf: '12345',
+        categories: [],
+        extracts: [],
+        lastExtractFetch: 0
+    }
 
-    getCustomerDTO: ({ id = '1', cartId = '1' }): CustomerDTO => {
-        return {
-            id,
-            cartId,
-        };
-    },
-};
+    getUser() {
+        return this.user;
+    }
+
+    withInvalidEmail() {
+        this.user.email = 'invalid';
+    }
+
+}
